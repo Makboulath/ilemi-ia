@@ -91,17 +91,15 @@ export async function ensureAdminUser(): Promise<void> {
 
   try {
     const prisma = await ensureDb();
+    const passwordHash = await hashPassword(password);
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
-      if (existing.role !== "ADMIN") {
-        await prisma.user.update({
-          where: { email },
-          data: { role: "ADMIN" },
-        });
-      }
+      await prisma.user.update({
+        where: { email },
+        data: { role: "ADMIN", passwordHash },
+      });
       return;
     }
-    const passwordHash = await hashPassword(password);
     await prisma.user.create({
       data: { email, passwordHash, role: "ADMIN" },
     });
