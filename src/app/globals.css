@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-ink: #14141a;
+  --color-cream: #f8f1e4;
+  --color-terracotta: #c1622d;
+  --color-navy: #232b45;
+  --color-gold: #e3a94d;
+  --font-heading: var(--font-montserrat);
+  --font-body: var(--font-karla);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-cream);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-terracotta) 55%, transparent);
+  color: var(--color-cream);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-terracotta);
+  color: var(--color-cream);
+  font-family: var(--font-heading), sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  padding: 0.85rem 1.35rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: color-mix(in srgb, var(--color-terracotta) 88%, black);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid color-mix(in srgb, var(--color-cream) 35%, transparent);
+  color: var(--color-cream);
+  font-family: var(--font-heading), sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  padding: 0.85rem 1.35rem;
+  border-radius: 0.25rem;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-ghost:hover {
+  border-color: var(--color-cream);
+  background: color-mix(in srgb, var(--color-cream) 6%, transparent);
+}
+
+.section-label {
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-terracotta);
+  margin-bottom: 0.75rem;
+}
+
+.card-lift {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease;
+}
+
+.card-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 48px rgba(20, 20, 26, 0.12);
+}
