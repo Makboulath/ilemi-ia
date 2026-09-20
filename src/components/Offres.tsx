@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { LINKS, OFFERS, type OfferProduct } from "@/lib/constants";
+import FadeIn from "@/components/motion/FadeIn";
+import { StaggerChildren, StaggerItem } from "@/components/motion/StaggerChildren";
 
 export default function Offres() {
   const [tab, setTab] = useState(0);
@@ -14,7 +16,7 @@ export default function Offres() {
       className="bg-cream text-ink py-16 md:py-28"
     >
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
-        <div className="mb-10 md:mb-12 max-w-xl">
+        <FadeIn className="mb-10 md:mb-12 max-w-xl">
           <p className="section-label">Nos offres</p>
           <h2
             id="offre-heading"
@@ -28,7 +30,7 @@ export default function Offres() {
             Chaque offre est une porte d&apos;entrée. Vous commencez là où vous
             êtes, et vous avancez à votre rythme.
           </p>
-        </div>
+        </FadeIn>
 
         <div
           role="tablist"
@@ -71,7 +73,7 @@ export default function Offres() {
           </p>
 
           {current.produits && (
-            <div
+            <StaggerChildren
               className={`grid gap-5 ${
                 current.produits.length === 1
                   ? "md:grid-cols-1 max-w-xl"
@@ -81,9 +83,11 @@ export default function Offres() {
               }`}
             >
               {current.produits.map((p) => (
-                <ProductCard key={p.titre} product={p} />
+                <StaggerItem key={p.titre}>
+                  <ProductCard product={p} />
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerChildren>
           )}
 
           {current.steps && (
@@ -93,24 +97,23 @@ export default function Offres() {
                   Comment on travaille ensuite
                 </h3>
               )}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StaggerChildren className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {current.steps.map((s) => (
-                <div
-                  key={s.n}
-                  className="card-lift rounded-2xl border border-ink/10 bg-white p-7"
-                >
-                  <span className="mb-4 block font-[family-name:var(--font-montserrat)] text-4xl font-extrabold tracking-tight text-terracotta">
-                    {s.n}
-                  </span>
-                  <h3 className="mb-2 font-[family-name:var(--font-montserrat)] text-lg font-bold">
-                    {s.title}
-                  </h3>
-                  <p className="text-[0.95rem] leading-relaxed text-ink/60">
-                    {s.body}
-                  </p>
-                </div>
+                <StaggerItem key={s.n}>
+                  <div className="card-lift rounded-2xl border border-ink/10 bg-white p-7">
+                    <span className="mb-4 block font-[family-name:var(--font-montserrat)] text-4xl font-extrabold tracking-tight text-terracotta">
+                      {s.n}
+                    </span>
+                    <h3 className="mb-2 font-[family-name:var(--font-montserrat)] text-lg font-bold">
+                      {s.title}
+                    </h3>
+                    <p className="text-[0.95rem] leading-relaxed text-ink/60">
+                      {s.body}
+                    </p>
+                  </div>
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerChildren>
             </>
           )}
 

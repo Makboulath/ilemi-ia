@@ -2,6 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { LINKS } from "@/lib/constants";
 
+const FOOTER_NAV = [
+  { href: "/#offre", label: "Offres" },
+  { href: "/studio", label: "Studio" },
+  { href: "/apprendre", label: "Apprendre" },
+  { href: "/#apropos", label: "À propos" },
+  { href: "/connexion", label: "Connexion" },
+];
+
 export default function Footer() {
   return (
     <footer className="border-t border-cream/10 bg-ink py-10">
@@ -28,12 +36,11 @@ export default function Footer() {
           className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-cream/55"
           aria-label="Pied de page"
         >
-          <Link href="/apprendre" className="hover:text-cream">
-            Apprendre
-          </Link>
-          <Link href="/connexion" className="hover:text-cream">
-            Connexion
-          </Link>
+          {FOOTER_NAV.map((item) => (
+            <Link key={item.href} href={item.href} className="hover:text-cream">
+              {item.label}
+            </Link>
+          ))}
           <a href={LINKS.mailto} className="hover:text-cream">
             {LINKS.email}
           </a>

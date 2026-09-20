@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthForm from "@/components/AuthForm";
@@ -16,6 +17,8 @@ export default async function ConnexionPage({
 }) {
   const sp = await searchParams;
   const next = typeof sp.next === "string" ? sp.next : "/espace";
+  const gated =
+    next.startsWith("/apprendre") || next.startsWith("/studio");
 
   return (
     <>
@@ -27,8 +30,22 @@ export default async function ConnexionPage({
             Connexion
           </h1>
           <p className="mt-3 text-ink/60">
-            Accédez à votre espace membre ou à l&apos;administration.
+            {gated
+              ? "Apprendre et le Studio sont réservés aux membres. Connectez-vous ou créez un compte pour continuer."
+              : "Accédez à votre espace membre ou à l'administration."}
           </p>
+          {gated && (
+            <p className="mt-3 rounded-lg border border-terracotta/25 bg-terracotta/5 px-3.5 py-2.5 text-sm text-ink/70">
+              Pas encore inscrit·e ?{" "}
+              <Link
+                href={`/inscription?next=${encodeURIComponent(next)}`}
+                className="font-medium text-terracotta underline-offset-2 hover:underline"
+              >
+                Créer un compte
+              </Link>{" "}
+              — c&apos;est gratuit pour accéder au hub et au Studio.
+            </p>
+          )}
           <div className="mt-8">
             <AuthForm mode="login" nextPath={next} />
           </div>

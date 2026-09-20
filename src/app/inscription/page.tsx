@@ -9,7 +9,17 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function InscriptionPage() {
+export default async function InscriptionPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const sp = await searchParams;
+  const next =
+    typeof sp.next === "string" && sp.next.startsWith("/")
+      ? sp.next
+      : "/espace";
+
   return (
     <>
       <Header />
@@ -20,11 +30,11 @@ export default function InscriptionPage() {
             Inscription
           </h1>
           <p className="mt-3 text-ink/60">
-            Créez un compte membre pour retrouver Apprendre, les offres et le
-            contact.
+            Créez un compte membre pour accéder à Apprendre, au Studio et à
+            votre espace.
           </p>
           <div className="mt-8">
-            <AuthForm mode="register" nextPath="/espace" />
+            <AuthForm mode="register" nextPath={next} />
           </div>
         </div>
       </main>

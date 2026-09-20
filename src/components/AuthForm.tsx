@@ -104,7 +104,7 @@ export default function AuthForm({
           <>
             Pas encore de compte ?{" "}
             <Link
-              href="/inscription"
+              href={`/inscription?next=${encodeURIComponent(nextPath)}`}
               className="font-medium text-terracotta underline-offset-2 hover:underline"
             >
               S&apos;inscrire
@@ -114,7 +114,7 @@ export default function AuthForm({
           <>
             Déjà inscrit·e ?{" "}
             <Link
-              href="/connexion"
+              href={`/connexion?next=${encodeURIComponent(nextPath)}`}
               className="font-medium text-terracotta underline-offset-2 hover:underline"
             >
               Se connecter

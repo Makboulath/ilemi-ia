@@ -12,6 +12,7 @@
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "bcryptjs": "^3.0.3",
+    "framer-motion": "^13.4.0",
     "jose": "^6.2.12",
     "next": "^16.3.5",
     "react": "19.1.0",
