@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { LINKS } from "@/lib/constants";
 
@@ -19,7 +20,14 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-cream text-ink shadow-sm">
       <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-5 py-3 md:px-8">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <LogoMark />
+          <Image
+            src="/logo-mark.png"
+            alt=""
+            width={36}
+            height={36}
+            className="h-9 w-9 object-contain"
+            priority
+          />
           <span className="font-[family-name:var(--font-montserrat)] text-[1.05rem] font-extrabold tracking-tight">
             ilémi.IA
           </span>
@@ -90,16 +98,5 @@ export default function Header() {
         </div>
       )}
     </header>
-  );
-}
-
-function LogoMark() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <circle cx="11" cy="11" r="6.5" stroke="#C1622D" strokeWidth="2.2" />
-      <circle cx="21" cy="11" r="6.5" stroke="#14141A" strokeWidth="2.2" opacity="0.55" />
-      <circle cx="11" cy="21" r="6.5" stroke="#14141A" strokeWidth="2.2" opacity="0.55" />
-      <circle cx="21" cy="21" r="6.5" stroke="#C1622D" strokeWidth="2.2" opacity="0.85" />
-    </svg>
   );
 }

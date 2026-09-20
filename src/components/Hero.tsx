@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { LINKS } from "@/lib/constants";
 
 export default function Hero() {
@@ -6,20 +7,22 @@ export default function Hero() {
       className="relative overflow-hidden bg-ink"
       aria-labelledby="hero-heading"
     >
-      <div
+      <Image
+        src="/hero-fondatrice.jpg"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-[72%_center] md:object-[78%_center]"
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-40"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 60% at 70% 40%, rgba(35,80,120,0.55), transparent 60%), radial-gradient(ellipse 50% 40% at 30% 70%, rgba(193,98,45,0.18), transparent 55%)",
-        }}
       />
+      {/* Léger voile sombre pour lisibilité des textes */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-20 top-10 h-[420px] w-[420px] rounded-full opacity-30 blur-3xl"
+        className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(circle, rgba(90,160,200,0.5), transparent 70%)",
+            "linear-gradient(90deg, rgba(20,20,26,0.88) 0%, rgba(20,20,26,0.72) 42%, rgba(20,20,26,0.45) 68%, rgba(20,20,26,0.35) 100%), linear-gradient(180deg, rgba(20,20,26,0.25) 0%, transparent 30%, rgba(20,20,26,0.55) 100%)",
         }}
       />
 
@@ -27,13 +30,13 @@ export default function Hero() {
         <p className="section-label mb-4">L&apos;agence IA francophone</p>
         <h1
           id="hero-heading"
-          className="max-w-3xl font-[family-name:var(--font-montserrat)] text-[clamp(2.4rem,6vw,4.25rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-cream"
+          className="max-w-3xl font-[family-name:var(--font-montserrat)] text-[clamp(2.4rem,6vw,4.25rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-cream drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]"
         >
           L&apos;IA, enfin
           <br />
           chez vous.
         </h1>
-        <p className="mt-6 max-w-xl text-[1.05rem] leading-relaxed text-cream/80 md:text-[1.15rem]">
+        <p className="mt-6 max-w-xl text-[1.05rem] leading-relaxed text-cream/90 md:text-[1.15rem] drop-shadow-[0_1px_8px_rgba(0,0,0,0.4)]">
           Que vous vouliez apprendre, créer un projet avec l&apos;IA ou
           l&apos;intégrer dans votre entreprise, vous êtes au bon endroit.
         </p>
