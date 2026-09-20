@@ -15,7 +15,7 @@ export default function FadeIn({
   children,
   className,
   delay = 0,
-  y = 18,
+  y = 28,
   once = true,
 }: Props) {
   const reduce = useReducedMotion();
@@ -29,8 +29,8 @@ export default function FadeIn({
       className={className}
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once, margin: "-40px" }}
-      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ once, amount: 0.25 }}
+      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>

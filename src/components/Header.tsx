@@ -91,14 +91,6 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <a
-            href={LINKS.calendly}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary hidden !px-4 !py-2.5 text-[0.8rem] sm:inline-flex"
-          >
-            Prendre rendez-vous
-          </a>
           <button
             type="button"
             className="inline-flex h-10 w-10 items-center justify-center rounded border border-ink/15 lg:hidden"

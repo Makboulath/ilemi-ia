@@ -14,8 +14,8 @@ type Props = {
 export function StaggerChildren({
   children,
   className,
-  stagger = 0.08,
-  delay = 0,
+  stagger = 0.12,
+  delay = 0.05,
   once = true,
 }: Props) {
   const reduce = useReducedMotion();
@@ -29,7 +29,7 @@ export function StaggerChildren({
       className={className}
       initial="hidden"
       whileInView="show"
-      viewport={{ once, margin: "-40px" }}
+      viewport={{ once, amount: 0.2 }}
       variants={{
         hidden: {},
         show: {
@@ -45,7 +45,7 @@ export function StaggerChildren({
 export function StaggerItem({
   children,
   className,
-  y = 16,
+  y = 32,
 }: {
   children: ReactNode;
   className?: string;
@@ -61,11 +61,12 @@ export function StaggerItem({
     <motion.div
       className={className}
       variants={{
-        hidden: { opacity: 0, y },
+        hidden: { opacity: 0, y, scale: 0.98 },
         show: {
           opacity: 1,
           y: 0,
-          transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+          scale: 1,
+          transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
         },
       }}
     >

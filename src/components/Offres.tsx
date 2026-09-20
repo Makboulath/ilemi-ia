@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { LINKS, OFFERS, type OfferProduct } from "@/lib/constants";
-import FadeIn from "@/components/motion/FadeIn";
+import { LINKS, OFFERS } from "@/lib/constants";
 import { StaggerChildren, StaggerItem } from "@/components/motion/StaggerChildren";
+import { motion, useReducedMotion } from "framer-motion";
 
 export default function Offres() {
-  const [tab, setTab] = useState(0);
-  const current = OFFERS[tab];
+  const reduce = useReducedMotion();
 
   return (
     <section
@@ -16,7 +14,13 @@ export default function Offres() {
       className="bg-cream text-ink py-16 md:py-28"
     >
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
-        <FadeIn className="mb-10 md:mb-12 max-w-xl">
+        <motion.div
+          className="mb-10 max-w-xl md:mb-14"
+          initial={reduce ? false : { opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        >
           <p className="section-label">Nos offres</p>
           <h2
             id="offre-heading"
@@ -26,172 +30,75 @@ export default function Offres() {
             <br />
             Entrez par la porte qui vous convient.
           </h2>
-          <p className="mt-4 text-[1.05rem] leading-relaxed text-ink/60 max-w-lg">
-            Chaque offre est une porte d&apos;entrée. Vous commencez là où vous
-            êtes, et vous avancez à votre rythme.
+          <p className="mt-4 max-w-lg text-[1.05rem] leading-relaxed text-ink/60">
+            Trois portes d&apos;entrée. Vous commencez là où vous êtes, et vous
+            avancez à votre rythme.
           </p>
-        </FadeIn>
+        </motion.div>
 
-        <div
-          role="tablist"
-          aria-label="Piliers d'offres"
-          className="mb-8 flex flex-wrap gap-2 border-b border-ink/10 pb-1"
-        >
-          {OFFERS.map((pillar, i) => {
-            const active = i === tab;
+        <StaggerChildren className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
+          {OFFERS.map((pillar) => {
+            const highlight = pillar.produits?.[0];
             return (
-              <button
-                key={pillar.id}
-                role="tab"
-                type="button"
-                aria-selected={active}
-                id={`tab-${pillar.id}`}
-                aria-controls={`panel-${pillar.id}`}
-                onClick={() => setTab(i)}
-                className={`rounded-t px-4 py-3 text-sm font-[family-name:var(--font-montserrat)] font-bold transition ${
-                  active
-                    ? "bg-ink text-cream"
-                    : "text-ink/55 hover:text-ink hover:bg-ink/5"
-                }`}
-              >
-                <span className="mr-2 opacity-80" aria-hidden>
-                  {pillar.icon}
-                </span>
-                {pillar.label}
-              </button>
+              <StaggerItem key={pillar.id} className="h-full">
+                <article className="card-lift flex h-full flex-col rounded-2xl border border-ink/10 bg-white p-6 md:p-7">
+                  <p className="mb-3 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-terracotta">
+                    <span className="mr-1.5" aria-hidden>
+                      {pillar.icon}
+                    </span>
+                    {pillar.label}
+                  </p>
+                  <h3 className="mb-3 font-[family-name:var(--font-montserrat)] text-[1.25rem] font-bold leading-snug tracking-tight text-ink">
+                    {highlight?.titre ?? pillar.label}
+                  </h3>
+                  <p className="mb-5 text-[0.95rem] leading-relaxed text-ink/60">
+                    {highlight?.desc ?? pillar.intro}
+                  </p>
+                  {highlight?.inclus && (
+                    <ul className="mb-6 flex-1 space-y-2">
+                      {highlight.inclus.slice(0, 4).map((item) => (
+                        <li
+                          key={item}
+                          className="flex gap-2.5 text-sm leading-snug text-ink/55"
+                        >
+                          <span
+                            className="shrink-0 font-bold text-terracotta"
+                            aria-hidden
+                          >
+                            ✓
+                          </span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <a
+                    href={LINKS.calendly}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-auto block rounded-[3px] border-[1.5px] border-terracotta px-5 py-3 text-center text-[0.8rem] font-[family-name:var(--font-montserrat)] font-bold text-terracotta transition hover:bg-terracotta/5"
+                  >
+                    En savoir plus
+                  </a>
+                </article>
+              </StaggerItem>
             );
           })}
-        </div>
+        </StaggerChildren>
 
-        <div
-          role="tabpanel"
-          id={`panel-${current.id}`}
-          aria-labelledby={`tab-${current.id}`}
-        >
-          <p className="mb-5 max-w-2xl text-[1.02rem] leading-relaxed text-ink/65">
-            {current.intro}
-          </p>
-
-          {current.produits && current.produits.length > 0 && (
-            <div
-              className={`grid gap-5 ${
-                current.produits.length === 1
-                  ? "md:grid-cols-1 max-w-xl"
-                  : current.produits.length === 2
-                    ? "md:grid-cols-2"
-                    : "md:grid-cols-3"
-              }`}
-            >
-              {current.produits.map((p) => (
-                <ProductCard key={p.titre} product={p} />
-              ))}
-            </div>
-          )}
-
-          {current.steps && (
-            <>
-              {current.produits && current.produits.length > 0 && (
-                <h3 className="mt-8 mb-5 font-[family-name:var(--font-montserrat)] text-lg font-bold text-ink/80">
-                  Comment on travaille ensuite
-                </h3>
-              )}
-            <StaggerChildren className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {current.steps.map((s) => (
-                <StaggerItem key={s.n}>
-                  <div className="card-lift rounded-2xl border border-ink/10 bg-white p-7">
-                    <span className="mb-4 block font-[family-name:var(--font-montserrat)] text-4xl font-extrabold tracking-tight text-terracotta">
-                      {s.n}
-                    </span>
-                    <h3 className="mb-2 font-[family-name:var(--font-montserrat)] text-lg font-bold">
-                      {s.title}
-                    </h3>
-                    <p className="text-[0.95rem] leading-relaxed text-ink/60">
-                      {s.body}
-                    </p>
-                  </div>
-                </StaggerItem>
-              ))}
-            </StaggerChildren>
-            </>
-          )}
-
-          <p className="mt-8 text-sm text-ink/55">
-            30 minutes gratuites pour clarifier votre besoin,{" "}
-            <a
-              href={LINKS.calendly}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-terracotta underline-offset-2 hover:underline"
-            >
-              réserver sur Calendly
-            </a>
-            .
-          </p>
-        </div>
+        <p className="mt-8 text-sm text-ink/55">
+          30 minutes gratuites pour clarifier votre besoin,{" "}
+          <a
+            href={LINKS.calendly}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-terracotta underline-offset-2 hover:underline"
+          >
+            réserver sur Calendly
+          </a>
+          .
+        </p>
       </div>
     </section>
-  );
-}
-
-function ProductCard({ product }: { product: OfferProduct }) {
-  const accent = product.accent;
-  return (
-    <article
-      className={`card-lift relative flex h-full flex-col border p-7 ${
-        accent
-          ? "border-terracotta border-t-[3px] bg-navy text-cream"
-          : "border-ink/10 bg-white text-ink"
-      }`}
-    >
-      {product.badge && (
-        <span className="absolute -top-px right-5 bg-gold px-3 py-1 text-[0.68rem] font-bold uppercase tracking-wider text-ink">
-          {product.badge}
-        </span>
-      )}
-      <p className="mb-2.5 text-[0.7rem] font-medium uppercase tracking-[0.1em] text-terracotta">
-        {product.pour}
-      </p>
-      <h3
-        className={`mb-3 font-[family-name:var(--font-montserrat)] text-[1.15rem] font-bold leading-snug tracking-tight ${
-          accent ? "text-cream" : "text-ink"
-        }`}
-      >
-        {product.titre}
-      </h3>
-      <p
-        className={`mb-5 text-[0.95rem] leading-relaxed ${
-          accent ? "text-cream/60" : "text-ink/55"
-        }`}
-      >
-        {product.desc}
-      </p>
-      <ul className="mb-6 flex-1 space-y-2">
-        {product.inclus.map((item) => (
-          <li
-            key={item}
-            className={`flex gap-2.5 text-sm leading-snug ${
-              accent ? "text-cream/60" : "text-ink/55"
-            }`}
-          >
-            <span className="shrink-0 font-bold text-terracotta" aria-hidden>
-              ✓
-            </span>
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-      <a
-        href={LINKS.calendly}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`mt-auto block rounded-[3px] px-5 py-3 text-center text-[0.8rem] font-[family-name:var(--font-montserrat)] font-bold transition ${
-          accent
-            ? "bg-terracotta text-cream hover:brightness-110"
-            : "border-[1.5px] border-terracotta text-terracotta hover:bg-terracotta/5"
-        }`}
-      >
-        En savoir plus
-      </a>
-    </article>
   );
 }

@@ -11,7 +11,17 @@ export const SITE = {
   tagline: "L'agence IA francophone",
   url: "https://ilemi-ia.vercel.app",
   description:
-    "Ilémi.IA accompagne particuliers et entreprises qui veulent adopter l'IA, sans jargon, sans intimidation. Ateliers, parcours et diagnostic entreprise.",
+    "Agence IA francophone basée en Afrique de l'Ouest. Ilémi.IA forme, accompagne et intègre l'IA pour freelances, PME et organisations : ateliers, parcours Créer avec l'IA, diagnostic entreprise et agents sur mesure.",
+  keywords: [
+    "agence IA",
+    "formation intelligence artificielle",
+    "IA francophone",
+    "diagnostic IA entreprise",
+    "agents IA",
+    "atelier IA Bénin",
+    "Ilémi",
+    "Makboulath Raoufou",
+  ],
 } as const;
 
 export type OfferProduct = {
