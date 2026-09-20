@@ -33,7 +33,7 @@ export default async function EspacePage() {
             {session.role === "ADMIN" ? " (admin)" : ""}.
           </p>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-3">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Link
               href="/apprendre"
               className="card-lift rounded-2xl border border-ink/10 bg-white p-6 hover:border-terracotta/40"
@@ -42,18 +42,29 @@ export default async function EspacePage() {
                 Apprendre
               </h2>
               <p className="mt-2 text-sm text-ink/55">
-                Ateliers, parcours et guides.
+                Leçons, quiz et certificat.
               </p>
             </Link>
             <Link
-              href="/#offre"
+              href="/studio"
               className="card-lift rounded-2xl border border-ink/10 bg-white p-6 hover:border-terracotta/40"
             >
               <h2 className="font-[family-name:var(--font-montserrat)] font-bold">
-                Offres
+                Studio
               </h2>
               <p className="mt-2 text-sm text-ink/55">
-                La Maison, entreprises, agents.
+                Image, vidéo, liens audio.
+              </p>
+            </Link>
+            <Link
+              href="/abonnement"
+              className="card-lift rounded-2xl border border-ink/10 bg-white p-6 hover:border-terracotta/40"
+            >
+              <h2 className="font-[family-name:var(--font-montserrat)] font-bold">
+                Abonnement
+              </h2>
+              <p className="mt-2 text-sm text-ink/55">
+                Crédits Pro mensuels.
               </p>
             </Link>
             <Link

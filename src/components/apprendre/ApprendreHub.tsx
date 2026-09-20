@@ -2,10 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { LINKS } from "@/lib/constants";
 import {
   LEARNING_PATHS,
+  QUIZ_PASS_SCORE,
+  QUIZ_TOTAL,
   allLessonIds,
   type LearningPath,
   type Lesson,
@@ -13,57 +16,63 @@ import {
 import FadeIn from "@/components/motion/FadeIn";
 import { StaggerChildren, StaggerItem } from "@/components/motion/StaggerChildren";
 
-function progressKey(email: string) {
-  return `ilemi-apprendre-progress:${email || "anonymous"}`;
-}
+type QuizQ = { id: string; q: string; choices: string[] };
 
 export default function ApprendreHub() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
-  const [done, setDone] = useState<Set<string>>(new Set());
+  const [displayName, setDisplayName] = useState("");
+  const [progress, setProgress] = useState<Record<string, string[]>>({});
+  const [certs, setCerts] = useState<
+    Record<string, { code: string; issuedAt: string }>
+  >({});
+  const [loading, setLoading] = useState(true);
   const [pathId, setPathId] = useState<LearningPath["id"]>("debutant");
   const [openLesson, setOpenLesson] = useState<string | null>(null);
   const reduce = useReducedMotion();
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/auth/me")
-      .then((r) => r.json())
-      .then((data) => {
-        if (cancelled) return;
-        const em = data?.user?.email || "";
-        setEmail(em);
-        try {
-          const raw = localStorage.getItem(progressKey(em));
-          if (raw) {
-            const ids = JSON.parse(raw) as string[];
-            setDone(new Set(ids));
-          }
-        } catch {
-          /* ignore */
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const persist = useCallback(
-    (next: Set<string>) => {
-      setDone(next);
-      try {
-        localStorage.setItem(
-          progressKey(email),
-          JSON.stringify(Array.from(next)),
-        );
-      } catch {
-        /* ignore */
+  const load = useCallback(async () => {
+    try {
+      const me = await fetch("/api/auth/me").then((r) => r.json());
+      if (!me?.user) {
+        router.replace("/connexion?next=/apprendre");
+        return;
       }
-    },
-    [email],
-  );
+      setEmail(me.user.email || "");
+      const data = await fetch("/api/apprendre/progress").then((r) => r.json());
+      if (!data.ok) {
+        router.replace("/connexion?next=/apprendre");
+        return;
+      }
+      setProgress(data.progress || {});
+      setDisplayName(data.displayName || "");
+      const map: Record<string, { code: string; issuedAt: string }> = {};
+      for (const c of data.certificates || []) {
+        map[c.pathId] = { code: c.code, issuedAt: c.issuedAt };
+      }
+      setCerts(map);
+    } catch {
+      router.replace("/connexion?next=/apprendre");
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const done = useMemo(() => {
+    const s = new Set<string>();
+    for (const ids of Object.values(progress)) {
+      for (const id of ids) s.add(id);
+    }
+    return s;
+  }, [progress]);
 
   const path = LEARNING_PATHS.find((p) => p.id === pathId)!;
+  const pathDoneIds = progress[pathId] || [];
+  const pathAllDone = path.lessons.every((l) => pathDoneIds.includes(l.id));
   const total = allLessonIds().length;
   const doneCount = useMemo(
     () => allLessonIds().filter((id) => done.has(id)).length,
@@ -71,11 +80,29 @@ export default function ApprendreHub() {
   );
   const pct = total ? Math.round((doneCount / total) * 100) : 0;
 
-  function toggleDone(id: string) {
-    const next = new Set(done);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    persist(next);
+  async function toggleDone(lessonId: string) {
+    const currently = pathDoneIds.includes(lessonId);
+    const res = await fetch("/api/apprendre/progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        pathId,
+        lessonId,
+        completed: !currently,
+      }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      setProgress((prev) => ({ ...prev, [pathId]: data.completedLessonIds }));
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-[1200px] px-5 py-20 text-ink/50">
+        Chargement du hub…
+      </div>
+    );
   }
 
   return (
@@ -86,9 +113,9 @@ export default function ApprendreHub() {
           Apprendre avec Ilémi
         </h1>
         <p className="mt-4 max-w-2xl text-[1.08rem] leading-relaxed text-ink/65">
-          Un hub de formation clair : parcours Débutant, Créateur ou Pro,
-          leçons en accordéon, quiz instantanés, progression sauvegardée sur
-          cet appareil{email ? ` pour ${email}` : ""}.
+          Parcours Débutant, Créateur ou Pro : leçons, quiz final (≥{" "}
+          {QUIZ_PASS_SCORE}/{QUIZ_TOTAL}), certificat PDF. Progression
+          sauvegardée{email ? ` pour ${email}` : ""}.
         </p>
       </FadeIn>
 
@@ -102,7 +129,7 @@ export default function ApprendreHub() {
               </p>
             </div>
             <p className="text-xs text-ink/45">
-              Stockée localement (navigateur)
+              Synchronisée en base
               {email ? ` · ${email}` : ""}
             </p>
           </div>
@@ -120,7 +147,8 @@ export default function ApprendreHub() {
       <StaggerChildren className="mt-10 grid gap-4 md:grid-cols-3">
         {LEARNING_PATHS.map((p) => {
           const active = p.id === pathId;
-          const pathDone = p.lessons.filter((l) => done.has(l.id)).length;
+          const pathDone = (progress[p.id] || []).length;
+          const hasCert = !!certs[p.id];
           return (
             <StaggerItem key={p.id}>
               <button
@@ -158,6 +186,7 @@ export default function ApprendreHub() {
                   }`}
                 >
                   {pathDone}/{p.lessons.length} terminées
+                  {hasCert ? " · Certificat ✓" : ""}
                 </p>
               </button>
             </StaggerItem>
@@ -193,11 +222,29 @@ export default function ApprendreHub() {
                   cur === lesson.id ? null : lesson.id,
                 )
               }
-              isDone={done.has(lesson.id)}
+              isDone={pathDoneIds.includes(lesson.id)}
               onToggleDone={() => toggleDone(lesson.id)}
             />
           ))}
         </div>
+      </FadeIn>
+
+      <FadeIn className="mt-10" delay={0.05}>
+        <PathQuizPanel
+          pathId={pathId}
+          pathLabel={path.label}
+          unlocked={pathAllDone}
+          completedCount={pathDoneIds.length}
+          totalLessons={path.lessons.length}
+          existingCert={certs[pathId] || null}
+          learnerHint={displayName || email}
+          onCertified={(code, issuedAt) =>
+            setCerts((prev) => ({
+              ...prev,
+              [pathId]: { code, issuedAt },
+            }))
+          }
+        />
       </FadeIn>
 
       <FadeIn className="mt-14" delay={0.05}>
@@ -230,6 +277,261 @@ export default function ApprendreHub() {
           </div>
         </div>
       </FadeIn>
+    </div>
+  );
+}
+
+function PathQuizPanel({
+  pathId,
+  pathLabel,
+  unlocked,
+  completedCount,
+  totalLessons,
+  existingCert,
+  learnerHint,
+  onCertified,
+}: {
+  pathId: LearningPath["id"];
+  pathLabel: string;
+  unlocked: boolean;
+  completedCount: number;
+  totalLessons: number;
+  existingCert: { code: string; issuedAt: string } | null;
+  learnerHint: string;
+  onCertified: (code: string, issuedAt: string) => void;
+}) {
+  const [questions, setQuestions] = useState<QuizQ[]>([]);
+  const [attemptToken, setAttemptToken] = useState("");
+  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [loadingQuiz, setLoadingQuiz] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<{
+    score: number;
+    total: number;
+    passed: boolean;
+    details: {
+      id: string;
+      correct: number;
+      explain: string;
+      yourChoice: number | null;
+      ok: boolean;
+    }[];
+    certificate: { code: string; downloadUrl: string } | null;
+  } | null>(null);
+  const [error, setError] = useState("");
+
+  async function startQuiz() {
+    setError("");
+    setResult(null);
+    setAnswers({});
+    setLoadingQuiz(true);
+    try {
+      const res = await fetch(
+        `/api/apprendre/quiz?path=${encodeURIComponent(pathId)}`,
+      );
+      const data = await res.json();
+      if (!data.ok) {
+        setError(data.message || "Quiz indisponible.");
+        return;
+      }
+      setQuestions(data.questions);
+      setAttemptToken(data.attemptToken);
+    } catch {
+      setError("Impossible de charger le quiz.");
+    } finally {
+      setLoadingQuiz(false);
+    }
+  }
+
+  async function submitQuiz() {
+    if (questions.some((q) => answers[q.id] == null)) {
+      setError("Répondez à toutes les questions.");
+      return;
+    }
+    setSubmitting(true);
+    setError("");
+    try {
+      const res = await fetch("/api/apprendre/quiz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pathId,
+          attemptToken,
+          answers: questions.map((q) => ({
+            id: q.id,
+            choice: answers[q.id],
+          })),
+        }),
+      });
+      const data = await res.json();
+      if (!data.ok) {
+        setError(data.message || "Échec de l'envoi.");
+        return;
+      }
+      setResult(data);
+      if (data.passed && data.certificate) {
+        onCertified(data.certificate.code, new Date().toISOString());
+      }
+    } catch {
+      setError("Erreur réseau.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="rounded-2xl border border-ink/10 bg-white p-6 md:p-8">
+      <p className="text-[0.7rem] font-medium uppercase tracking-[0.1em] text-terracotta">
+        Quiz final · {pathLabel}
+      </p>
+      <h3 className="mt-1 font-[family-name:var(--font-montserrat)] text-xl font-bold">
+        Validez le parcours et obtenez votre certificat
+      </h3>
+      <p className="mt-2 text-sm text-ink/55">
+        {QUIZ_TOTAL} questions · réussite ≥ {QUIZ_PASS_SCORE}/{QUIZ_TOTAL}. En
+        cas d&apos;échec, les questions et options sont remélangées.
+      </p>
+      <p className="mt-1 text-xs text-ink/40">Apprenant : {learnerHint}</p>
+
+      {!unlocked && (
+        <div className="mt-5 rounded-xl bg-ink/5 px-4 py-3 text-sm text-ink/60">
+          Quiz verrouillé — terminez les {totalLessons} leçons (
+          {completedCount}/{totalLessons}).
+        </div>
+      )}
+
+      {existingCert && (
+        <div className="mt-5 flex flex-wrap items-center gap-3 rounded-xl border border-emerald-600/30 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          <span>
+            Certificat obtenu · code <strong>{existingCert.code}</strong>
+          </span>
+          <a
+            href={`/api/apprendre/certificate?path=${encodeURIComponent(pathId)}`}
+            className="font-medium text-terracotta underline-offset-2 hover:underline"
+          >
+            Télécharger le PDF
+          </a>
+        </div>
+      )}
+
+      {unlocked && (
+        <div className="mt-5">
+          {questions.length === 0 && !result && (
+            <button
+              type="button"
+              onClick={startQuiz}
+              disabled={loadingQuiz}
+              className="btn-primary disabled:opacity-50"
+            >
+              {loadingQuiz
+                ? "Préparation…"
+                : existingCert
+                  ? "Repasser le quiz (entraînement)"
+                  : "Lancer le quiz"}
+            </button>
+          )}
+
+          {questions.length > 0 && !result && (
+            <div className="space-y-5">
+              {questions.map((q, idx) => (
+                <div
+                  key={q.id}
+                  className="rounded-xl border border-ink/10 p-4"
+                >
+                  <p className="font-medium">
+                    {idx + 1}. {q.q}
+                  </p>
+                  <div className="mt-3 space-y-2">
+                    {q.choices.map((c, i) => (
+                      <button
+                        key={`${q.id}-${i}`}
+                        type="button"
+                        onClick={() =>
+                          setAnswers((prev) => ({ ...prev, [q.id]: i }))
+                        }
+                        className={`w-full rounded-lg border px-3 py-2.5 text-left text-sm transition ${
+                          answers[q.id] === i
+                            ? "border-terracotta bg-terracotta/10"
+                            : "border-ink/12 hover:border-terracotta/40"
+                        }`}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={submitQuiz}
+                disabled={submitting}
+                className="btn-primary disabled:opacity-50"
+              >
+                {submitting ? "Correction…" : "Valider mes réponses"}
+              </button>
+            </div>
+          )}
+
+          {result && (
+            <div className="mt-4 space-y-4">
+              <div
+                className={`rounded-xl px-4 py-3 text-sm ${
+                  result.passed
+                    ? "border border-emerald-600/30 bg-emerald-50 text-emerald-800"
+                    : "border border-terracotta/30 bg-terracotta/5 text-terracotta"
+                }`}
+              >
+                Score : {result.score}/{result.total}.{" "}
+                {result.passed
+                  ? "Félicitations, parcours validé !"
+                  : `Échec — il faut ≥ ${QUIZ_PASS_SCORE}/${QUIZ_TOTAL}. Retentez (questions remélangées).`}
+              </div>
+              {result.details.map((d) => {
+                const q = questions.find((x) => x.id === d.id);
+                return (
+                  <div
+                    key={d.id}
+                    className="rounded-lg border border-ink/8 p-3 text-sm"
+                  >
+                    <p className="font-medium">{q?.q}</p>
+                    <p
+                      className={`mt-1 ${
+                        d.ok ? "text-emerald-700" : "text-terracotta"
+                      }`}
+                    >
+                      {d.ok ? "✓ Exact. " : "Pas exact. "}
+                      {d.explain}
+                    </p>
+                  </div>
+                );
+              })}
+              {result.passed && result.certificate && (
+                <a
+                  href={result.certificate.downloadUrl}
+                  className="btn-primary inline-flex"
+                >
+                  Télécharger mon certificat PDF
+                </a>
+              )}
+              {!result.passed && (
+                <button
+                  type="button"
+                  onClick={startQuiz}
+                  className="btn-primary"
+                >
+                  Retenter le quiz
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {error && (
+        <p className="mt-3 text-sm text-terracotta" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -319,7 +621,7 @@ function LessonAccordion({
               {lesson.quiz && (
                 <div className="mt-5 rounded-xl border border-ink/10 p-4">
                   <p className="text-[0.7rem] font-medium uppercase tracking-[0.1em] text-terracotta">
-                    Quiz
+                    Mini-quiz
                   </p>
                   <p className="mt-1 font-medium">{lesson.quiz.q}</p>
                   <div className="mt-3 space-y-2">
@@ -335,7 +637,8 @@ function LessonAccordion({
                       } else if (isCorrect) {
                         cls += "border-emerald-600/40 bg-emerald-50 text-ink";
                       } else if (selected) {
-                        cls += "border-terracotta/40 bg-terracotta/5 text-ink/70";
+                        cls +=
+                          "border-terracotta/40 bg-terracotta/5 text-ink/70";
                       } else {
                         cls += "border-ink/8 text-ink/45";
                       }

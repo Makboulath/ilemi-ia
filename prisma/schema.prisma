@@ -13,11 +13,23 @@ enum Role {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  role         Role     @default(MEMBER)
-  createdAt    DateTime @default(now())
+  id                String   @id @default(cuid())
+  email             String   @unique
+  passwordHash      String
+  role              Role     @default(MEMBER)
+  displayName       String?
+  plan              String   @default("FREE")
+  credits           Int      @default(7)
+  creditsBootstrapped Boolean @default(true)
+  videoDate         String?
+  videoCountToday   Int      @default(0)
+  stripeCustomerId  String?
+  createdAt         DateTime @default(now())
+
+  courseProgress    CourseProgress[]
+  quizAttempts      QuizAttempt[]
+  certificates      Certificate[]
+  generations       StudioGeneration[]
 }
 
 model PageView {
@@ -37,4 +49,59 @@ model Conversion {
 
   @@index([createdAt])
   @@index([type])
+}
+
+model CourseProgress {
+  id                 String   @id @default(cuid())
+  userId             String
+  pathId             String
+  completedLessonIds String   @default("[]")
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pathId])
+  @@index([userId])
+}
+
+model QuizAttempt {
+  id        String   @id @default(cuid())
+  userId    String
+  pathId    String
+  score     Int
+  passed    Boolean
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, pathId])
+  @@index([createdAt])
+}
+
+model Certificate {
+  id          String   @id @default(cuid())
+  userId      String
+  pathId      String
+  code        String   @unique
+  issuedAt    DateTime @default(now())
+  learnerName String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pathId])
+  @@index([userId])
+}
+
+model StudioGeneration {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  prompt    String
+  url       String?
+  meta      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }

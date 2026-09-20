@@ -323,3 +323,226 @@ export const LEARNING_PATHS: LearningPath[] = [
 export function allLessonIds(): string[] {
   return LEARNING_PATHS.flatMap((p) => p.lessons.map((l) => l.id));
 }
+
+/** Final path quiz: at least 5 questions. Pass ≥ 4/5. */
+export type PathQuizQuestion = {
+  id: string;
+  q: string;
+  choices: string[];
+  correct: number;
+  explain: string;
+};
+
+export const PATH_QUIZZES: Record<
+  LearningPath["id"],
+  PathQuizQuestion[]
+> = {
+  debutant: [
+    {
+      id: "dq1",
+      q: "Un modèle de langage…",
+      choices: [
+        "Comprend vraiment comme un humain",
+        "Prédit la suite probable d'un texte",
+        "Accède toujours à internet en temps réel",
+        "Remplace le jugement humain",
+      ],
+      correct: 1,
+      explain:
+        "Il prédit la suite la plus probable. Ce n'est pas de la compréhension humaine.",
+    },
+    {
+      id: "dq2",
+      q: "Face à une réponse IA sur un chiffre important, que faire ?",
+      choices: [
+        "La publier telle quelle",
+        "La vérifier avec une source fiable",
+        "Lui faire confiance si le ton est sûr",
+        "La reformuler sans vérifier",
+      ],
+      correct: 1,
+      explain:
+        "Le ton confiant n'est pas une preuve. Vérifiez les faits importants.",
+    },
+    {
+      id: "dq3",
+      q: "Quel élément manque souvent aux prompts faibles ?",
+      choices: [
+        "Le contexte et le format attendu",
+        "Des emojis",
+        "Du code Python",
+        "Une longue introduction",
+      ],
+      correct: 0,
+      explain:
+        "Contexte + format (longueur, ton, structure) font la différence.",
+    },
+    {
+      id: "dq4",
+      q: "Quelle est la meilleure habitude au quotidien ?",
+      choices: [
+        "Envoyer le premier jet tel quel",
+        "Itérer et relire avant d'envoyer",
+        "Changer d'outil à chaque message",
+        "Coller des données sensibles pour plus de précision",
+      ],
+      correct: 1,
+      explain:
+        "Itération + relecture = qualité et responsabilité.",
+    },
+    {
+      id: "dq5",
+      q: "Pour démarrer avec les outils IA, le meilleur conseil est…",
+      choices: [
+        "Maîtriser dix outils à moitié",
+        "Choisir 1 outil texte + 1 usage récurrent",
+        "Attendre l'outil parfait",
+        "Ne jamais poser de contraintes",
+      ],
+      correct: 1,
+      explain:
+        "Un outil bien maîtrisé vaut mieux que dix outils à moitié.",
+    },
+  ],
+  createur: [
+    {
+      id: "cq1",
+      q: "Le meilleur premier objectif créatif est…",
+      choices: [
+        "Un produit « complet »",
+        "Un livrable minimal montrable",
+        "Dix idées en parallèle",
+        "Une roadmap de 2 ans",
+      ],
+      correct: 1,
+      explain:
+        "Un livrable minimal prouve l'idée et débloque les retours.",
+    },
+    {
+      id: "cq2",
+      q: "Dans un bon workflow créatif, l'IA…",
+      choices: [
+        "Remplace entièrement votre voix",
+        "Produit le volume ; vous apportez le point de vue",
+        "Publie toute seule",
+        "Choisit votre marque à votre place",
+      ],
+      correct: 1,
+      explain:
+        "Votre regard et votre ton restent le différenciateur.",
+    },
+    {
+      id: "cq3",
+      q: "Pour un prompt image efficace, il faut préciser…",
+      choices: [
+        "Seulement le sujet",
+        "Sujet, style, lumière, composition et exclusions",
+        "Uniquement le nom de l'outil",
+        "Rien : l'IA devine",
+      ],
+      correct: 1,
+      explain:
+        "Plus c'est précis, moins le résultat est générique.",
+    },
+    {
+      id: "cq4",
+      q: "Comment éviter le contenu générique ?",
+      choices: [
+        "Multiplier les buzzwords",
+        "Ajouter détails vécus, chiffres, anecdotes",
+        "Copier les concurrents mot pour mot",
+        "Laisser l'IA publier sans relecture",
+      ],
+      correct: 1,
+      explain:
+        "Les détails concrets rendent le contenu crédible et unique.",
+    },
+    {
+      id: "cq5",
+      q: "Un bon enchaînement créatif est…",
+      choices: [
+        "Image d'abord, brief ensuite",
+        "Brief texte → image → sélection et peaufinage",
+        "Publier sans brief",
+        "Changer d'outil à chaque étape sans documenter",
+      ],
+      correct: 1,
+      explain:
+        "Chaîner brief → exécution → sélection accélère et améliore la qualité.",
+    },
+  ],
+  pro: [
+    {
+      id: "pq1",
+      q: "Par où commencer l'IA en entreprise ?",
+      choices: [
+        "Déployer 10 outils d'un coup",
+        "1–2 cas d'usage à fort impact / faible risque",
+        "Attendre la « IA parfaite »",
+        "Former tout le monde sans cas pilote",
+      ],
+      correct: 1,
+      explain:
+        "Un pilote mesurable crée l'adhésion et évite le chaos.",
+    },
+    {
+      id: "pq2",
+      q: "Avant d'automatiser, il faut…",
+      choices: [
+        "Acheter l'outil le plus cher",
+        "Clarifier le process à la main",
+        "Former tout le monde en même temps",
+        "Désactiver toute revue humaine",
+      ],
+      correct: 1,
+      explain:
+        "Process clair d'abord. Ensuite seulement l'outil ou l'agent.",
+    },
+    {
+      id: "pq3",
+      q: "En matière de données sensibles…",
+      choices: [
+        "Tout coller dans un outil grand public",
+        "Définir ce qui ne doit jamais y aller",
+        "Ignorer les politiques internes",
+        "Compter uniquement sur le ton de l'IA",
+      ],
+      correct: 1,
+      explain:
+        "Une gouvernance légère mais lisible protège l'organisation.",
+    },
+    {
+      id: "pq4",
+      q: "Le ROI de l'IA se lit surtout en…",
+      choices: [
+        "Nombre de slides PowerPoint",
+        "Heures gagnées, erreurs évitées, qualité de service",
+        "Nombre d'outils installés",
+        "Longueur des prompts",
+      ],
+      correct: 1,
+      explain:
+        "Mesurez l'impact réel, pas la stack technologique.",
+    },
+    {
+      id: "pq5",
+      q: "Un plan d'adoption en 30 jours commence par…",
+      choices: [
+        "Acheter une licence enterprise sans diagnostic",
+        "Diagnostic léger + 1 cas pilote",
+        "Former 200 personnes le jour 1",
+        "Automatiser tous les process d'un coup",
+      ],
+      correct: 1,
+      explain:
+        "Diagnostic + pilote = base saine pour mesurer et décider.",
+    },
+  ],
+};
+
+export const QUIZ_PASS_SCORE = 4;
+export const QUIZ_TOTAL = 5;
+
+export function getPathById(id: string): LearningPath | undefined {
+  return LEARNING_PATHS.find((p) => p.id === id);
+}

@@ -56,7 +56,14 @@ export async function POST(request: Request) {
 
     const passwordHash = await hashPassword(password);
     const user = await prisma.user.create({
-      data: { email, passwordHash, role: "MEMBER" },
+      data: {
+        email,
+        passwordHash,
+        role: "MEMBER",
+        credits: 7,
+        creditsBootstrapped: true,
+        plan: "FREE",
+      },
     });
 
     const token = await createSessionToken({
