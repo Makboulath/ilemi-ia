@@ -34,7 +34,7 @@ export async function POST(request: Request) {
         ok: false,
         code: "NO_PROVIDER",
         message:
-          "Génération image indisponible : configurez FAL_KEY, OPENAI_API_KEY ou REPLICATE_API_TOKEN.",
+          "Génération image indisponible pour le moment. Réessayez dans quelques secondes.",
       },
       { status: 503 }
     );

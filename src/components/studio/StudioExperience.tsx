@@ -248,7 +248,7 @@ export default function StudioExperience() {
                 {zone === "image"
                   ? providers.image
                     ? "Provider image configuré (serveur)."
-                    : "Aucun provider image (FAL_KEY / OPENAI_API_KEY / REPLICATE_API_TOKEN) — l’UI reste utilisable, la génération renverra 503."
+                    : "Images via Pollinations (gratuit). Gemini / fal / OpenAI si configurés."
                   : providers.video
                     ? "Provider vidéo fal.ai configuré."
                     : "Aucun FAL_KEY — génération vidéo indisponible (503)."}
