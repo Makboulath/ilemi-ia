@@ -68,6 +68,16 @@ export async function submitContact(
       };
     }
 
+    try {
+      const { ensureDb } = await import("@/lib/db");
+      const prisma = await ensureDb();
+      await prisma.conversion.create({
+        data: { type: "contact_form", meta: email },
+      });
+    } catch {
+      // tracking must not break contact
+    }
+
     return {
       ok: true,
       message: "Message envoyé. Merci — on revient vers vous rapidement.",

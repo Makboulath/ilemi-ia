@@ -18,7 +18,9 @@ export default function Footer() {
             <p className="font-[family-name:var(--font-montserrat)] text-sm font-bold text-cream">
               ilémi.IA
             </p>
-            <p className="mt-0.5 text-sm text-cream/40">L&apos;IA enfin chez vous.</p>
+            <p className="mt-0.5 text-sm text-cream/40">
+              L&apos;IA enfin chez vous.
+            </p>
           </div>
         </div>
 
@@ -26,6 +28,12 @@ export default function Footer() {
           className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-cream/55"
           aria-label="Pied de page"
         >
+          <Link href="/apprendre" className="hover:text-cream">
+            Apprendre
+          </Link>
+          <Link href="/connexion" className="hover:text-cream">
+            Connexion
+          </Link>
           <a href={LINKS.mailto} className="hover:text-cream">
             {LINKS.email}
           </a>

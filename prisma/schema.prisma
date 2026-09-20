@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(MEMBER)
+  createdAt    DateTime @default(now())
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([path])
+}
+
+model Conversion {
+  id        String   @id @default(cuid())
+  type      String
+  meta      String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([type])
+}

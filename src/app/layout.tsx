@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Karla, Montserrat } from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/lib/constants";
+import PageTracker from "@/components/PageTracker";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -60,7 +61,10 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${montserrat.variable} ${karla.variable}`}>
       <body className="antialiased font-[family-name:var(--font-karla)]">
-        {children}
+        <>
+          <PageTracker />
+          {children}
+        </>
       </body>
     </html>
   );

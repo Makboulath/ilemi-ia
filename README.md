@@ -64,6 +64,23 @@ Liens branchés :
 - WhatsApp : https://wa.me/message/BVOJI7NRTXJAJ1  
 - Email : ilemi.ia27@gmail.com  
 
+
+
+## Auth & admin (v2)
+
+Variables à définir en local (`.env.local`) et sur Vercel :
+
+| Variable | Description |
+|---|---|
+| `ADMIN_EMAIL` | Email admin (ex. makboulathraoufou@gmail.com) |
+| `ADMIN_PASSWORD` | Mot de passe admin — **uniquement en env, jamais dans git** |
+| `AUTH_SECRET` | Secret JWT (chaîne aléatoire longue) |
+| `DATABASE_URL` | SQLite local : `file:./prisma/dev.db` |
+
+Sur Vercel, SQLite utilise `/tmp/ilemi.db` (éphémère par instance). Pour la production durable, migrer vers Postgres plus tard.
+
+Routes : `/connexion`, `/inscription`, `/espace` (membre), `/admin` (ADMIN), `/apprendre`.
+
 ## Déploiement sur Vercel + domaine custom
 
 1. Poussez le dépôt sur GitHub / GitLab / Bitbucket.  

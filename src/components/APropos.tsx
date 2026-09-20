@@ -65,29 +65,6 @@ export default function APropos() {
             ))}
           </div>
 
-          <div className="mt-10 flex flex-wrap gap-3">
-            <Image
-              src="/certificat.png"
-              alt="Certification"
-              width={120}
-              height={80}
-              className="h-16 w-auto rounded object-contain opacity-90"
-            />
-            <Image
-              src="/img7114.png"
-              alt="Illustration Ilémi"
-              width={120}
-              height={80}
-              className="h-16 w-auto rounded object-cover opacity-90"
-            />
-            <Image
-              src="/img7115.png"
-              alt="Communauté Ilémi"
-              width={120}
-              height={80}
-              className="h-16 w-auto rounded object-cover opacity-90"
-            />
-          </div>
         </div>
       </div>
     </section>
