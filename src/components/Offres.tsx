@@ -71,7 +71,15 @@ export default function Offres() {
           </p>
 
           {current.produits && (
-            <div className="grid gap-5 md:grid-cols-3">
+            <div
+              className={`grid gap-5 ${
+                current.produits.length === 1
+                  ? "md:grid-cols-1 max-w-xl"
+                  : current.produits.length === 2
+                    ? "md:grid-cols-2"
+                    : "md:grid-cols-3"
+              }`}
+            >
               {current.produits.map((p) => (
                 <ProductCard key={p.titre} product={p} />
               ))}
@@ -79,6 +87,12 @@ export default function Offres() {
           )}
 
           {current.steps && (
+            <>
+              {current.produits && (
+                <h3 className="mt-12 mb-5 font-[family-name:var(--font-montserrat)] text-lg font-bold text-ink/80">
+                  Comment on travaille ensuite
+                </h3>
+              )}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {current.steps.map((s) => (
                 <div
@@ -97,6 +111,7 @@ export default function Offres() {
                 </div>
               ))}
             </div>
+            </>
           )}
 
           <p className="mt-8 text-sm text-ink/55">

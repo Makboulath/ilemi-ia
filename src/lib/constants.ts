@@ -9,9 +9,9 @@ export const SITE = {
   name: "ilémi.IA",
   slogan: "L'IA, enfin chez vous.",
   tagline: "L'agence IA francophone",
-  url: "https://ilemi.ia",
+  url: "https://ilemi-ia.vercel.app",
   description:
-    "Ilémi.IA accompagne particuliers et entreprises qui veulent adopter l'IA — sans jargon, sans intimidation. Diagnostic, accompagnement et agents IA clés en main.",
+    "Ilémi.IA accompagne particuliers et entreprises qui veulent adopter l'IA — sans jargon, sans intimidation. Ateliers, parcours et diagnostic entreprise.",
 } as const;
 
 export type OfferProduct = {
@@ -38,42 +38,31 @@ export const OFFERS: OfferPillar[] = [
     label: "La Maison",
     icon: "◎",
     intro:
-      "Pour les curieux, freelances, étudiants et porteurs de projet. Venez apprendre ou construire quelque chose avec l'IA, sans pré-requis et sans y aller seul.",
+      "Pour démarrer concrètement avec l'IA : une première session pour comprendre, ou un parcours pour construire quelque chose de réel.",
     produits: [
       {
         titre: "Atelier découverte",
         pour: "Débutants et curieux",
-        desc: "Initiation courte en groupe pour démystifier l'IA sans jargon. Pas de code, juste des cas concrets et des outils utilisables dès le lendemain.",
+        desc: "Une session courte en groupe pour démystifier l'IA sans jargon. Des cas concrets, des outils utilisables dès le lendemain.",
         inclus: [
           "Session collective de quelques heures",
           "Panorama des outils IA accessibles",
           "Exercices pratiques sur des cas réels",
-          "Guide de ressources personnalisé",
+          "Guide de ressources à emporter",
         ],
       },
       {
         titre: "Parcours « Créer avec l'IA »",
         pour: "Porteurs de projet",
-        desc: "Vous arrivez avec une idée. On vous accompagne pour la construire, étape par étape, jusqu'à un projet ou outil qui fonctionne vraiment.",
+        desc: "Vous arrivez avec une idée. On vous accompagne jusqu'à un livrable qui fonctionne vraiment — pas un slide, un résultat.",
         inclus: [
-          "Accompagnement individuel, plusieurs semaines",
-          "Audit de votre idée et de sa faisabilité",
-          "Suivi personnalisé entre chaque session",
+          "Accompagnement individuel sur plusieurs semaines",
+          "Audit de l'idée et de sa faisabilité",
+          "Suivi entre chaque session",
           "Livrable fonctionnel en sortie",
         ],
-        badge: "Populaire",
+        badge: "Offre phare",
         accent: true,
-      },
-      {
-        titre: "Communauté Ilémi",
-        pour: "Apprenants continus",
-        desc: "Un espace permanent pour continuer à apprendre, poser des questions, partager ce qu'on construit. On n'apprend jamais bien tout seul.",
-        inclus: [
-          "Abonnement mensuel, accès continu",
-          "Entraide et ressources partagées",
-          "Événements réguliers en ligne et présentiel",
-          "Accès aux sessions enregistrées",
-        ],
       },
     ],
   },
@@ -82,7 +71,22 @@ export const OFFERS: OfferPillar[] = [
     label: "Entreprises",
     icon: "◈",
     intro:
-      "PME, startups, organisations : on intègre l'IA dans vos process existants, sans tout casser. Vous gagnez du temps, vos équipes gardent la main.",
+      "Pour les PME et organisations qui veulent gagner du temps sans tout casser. On commence par un diagnostic clair — chiffres et priorités, pas de jargon.",
+    produits: [
+      {
+        titre: "Diagnostic IA",
+        pour: "PME, startups, organisations",
+        desc: "En 2 à 3 semaines, on cartographie où l'IA peut concrètement faire gagner du temps et de l'argent dans votre activité — avec un plan actionnable.",
+        inclus: [
+          "Audit de vos process et outils actuels",
+          "Priorisation des cas d'usage (impact × effort)",
+          "Plan de mise en œuvre et budget indicatif",
+          "Restitution claire à partager avec votre équipe",
+        ],
+        badge: "Point d'entrée",
+        accent: true,
+      },
+    ],
     steps: [
       {
         n: "01",
@@ -92,17 +96,17 @@ export const OFFERS: OfferPillar[] = [
       {
         n: "02",
         title: "Le plan",
-        body: "On construit ensemble la stratégie : quels outils, dans quel ordre, avec quel budget. Rien de théorique. Tout est actionnable dès la semaine suivante.",
+        body: "On construit ensemble la stratégie : quels outils, dans quel ordre, avec quel budget. Tout est actionnable dès la semaine suivante.",
       },
       {
         n: "03",
         title: "La mise en œuvre",
-        body: "On intègre les solutions dans vos process existants. Agents IA configurés, équipes formées. Premiers résultats mesurables.",
+        body: "On intègre les solutions dans vos process. Équipes formées, premiers résultats mesurables.",
       },
       {
         n: "04",
         title: "L'autonomie",
-        body: "Vous prenez la main. On reste disponibles. L'objectif : vous rendre capables de continuer seuls. Pas une dépendance, une transition.",
+        body: "Vous prenez la main. On reste disponibles. L'objectif : vous rendre capables de continuer seuls.",
       },
     ],
   },
@@ -111,43 +115,20 @@ export const OFFERS: OfferPillar[] = [
     label: "Agents IA",
     icon: "⬡",
     intro:
-      "Des agents qui travaillent pour vous pendant que vous faites autre chose. Du plus simple au plus complet, prêts à l'emploi ou construits sur mesure.",
+      "Quand le besoin est clair : un agent pensé pour vos process, pas une démo générique. Sur devis, après un échange.",
     produits: [
       {
-        titre: "Agents prêts à l'emploi",
-        pour: "Structures qui veulent démarrer vite",
-        desc: "Des agents déjà construits, configurés rapidement pour votre cas d'usage. Opérationnels en 48h.",
+        titre: "Agent sur mesure",
+        pour: "Structures avec un besoin précis",
+        desc: "Un agent construit pour votre activité : il connaît vos process, s'intègre à vos outils, et travaille pendant que vous faites autre chose.",
         inclus: [
-          "Self-serve, prix d'entrée accessible",
-          "Sélection et configuration de l'agent",
-          "Formation à l'utilisation (1h)",
-          "Support technique 30 jours",
-        ],
-      },
-      {
-        titre: "Agents personnalisés",
-        pour: "Entreprises avec des besoins spécifiques",
-        desc: "Des agents pensés et construits pour vos process. Ils connaissent votre activité comme un collaborateur dès le premier jour.",
-        inclus: [
-          "Audit de vos besoins et process",
-          "Conception et développement sur mesure",
+          "Audit du besoin et du process cible",
+          "Conception et configuration de l'agent",
           "Intégration à vos outils existants",
-          "Tests, ajustements et documentation",
+          "Formation courte + documentation",
+          "Ajustements inclus sur la période de lancement",
         ],
-        badge: "Populaire",
         accent: true,
-      },
-      {
-        titre: "Écosystème d'agents",
-        pour: "Organisations qui veulent automatiser en profondeur",
-        desc: "Plusieurs agents interconnectés qui travaillent ensemble pour automatiser une activité entière. C'est ce qu'Ilémi.IA utilise elle-même pour tourner.",
-        inclus: [
-          "Cartographie complète de l'automatisation",
-          "Développement de plusieurs agents coordonnés",
-          "Intégration complète à votre infrastructure",
-          "Tableau de bord de supervision",
-          "Accompagnement et maintenance inclus",
-        ],
       },
     ],
   },
