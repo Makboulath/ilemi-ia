@@ -21,7 +21,7 @@ export default function Hero() {
         className="object-cover object-[72%_center] md:object-[78%_center]"
         aria-hidden
       />
-      {/* Voile sur la photo uniquement — le texte reste net au-dessus */}
+      {/* Voile sur la photo uniquement, le texte reste net au-dessus */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"

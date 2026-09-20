@@ -34,13 +34,13 @@ export const LEARNING_PATHS: LearningPath[] = [
         title: "Qu'est-ce que l'IA, vraiment ?",
         minutes: 6,
         body: [
-          "L'intelligence artificielle, ce n'est pas un cerveau humain dans une machine. C'est un ensemble d'outils qui apprennent des motifs à partir de données — textes, images, sons — pour produire des réponses utiles.",
+          "L'intelligence artificielle, ce n'est pas un cerveau humain dans une machine. C'est un ensemble d'outils qui apprennent des motifs à partir de données, textes, images, sons, pour produire des réponses utiles.",
           "Les outils grand public (ChatGPT, Claude, Gemini, Copilot…) sont des modèles de langage : ils prédisent la suite la plus probable d'un texte. Ils ne « savent » pas comme une personne ; ils synthétisent.",
           "Bonne nouvelle : vous n'avez pas besoin de coder pour les utiliser. Ce qui compte, c'est de savoir poser une question claire et de vérifier le résultat.",
         ],
         tips: [
           "Pensez « assistant intelligent » plutôt que « magicien ».",
-          "L'IA amplifie votre intention — elle ne remplace pas votre jugement.",
+          "L'IA amplifie votre intention, elle ne remplace pas votre jugement.",
         ],
         quiz: {
           q: "Un modèle de langage…",
@@ -65,7 +65,7 @@ export const LEARNING_PATHS: LearningPath[] = [
         ],
         tips: [
           "Pour les faits critiques (chiffres, juridique, santé) : vérifiez une source fiable.",
-          "Pour la créativité : laissez plus de marge — c'est là que l'IA brille.",
+          "Pour la créativité : laissez plus de marge, c'est là que l'IA brille.",
         ],
         quiz: {
           q: "Face à une réponse IA sur un chiffre important, que faire ?",
@@ -90,7 +90,7 @@ export const LEARNING_PATHS: LearningPath[] = [
         ],
         tips: [
           "Si le résultat est moyen : refinez en 1 phrase (« plus court », « plus concret », « ajoute un exemple »).",
-          "Gardez vos meilleurs prompts dans un fichier — c'est votre bibliothèque.",
+          "Gardez vos meilleurs prompts dans un fichier, c'est votre bibliothèque.",
         ],
         quiz: {
           q: "Quel élément manque souvent aux prompts faibles ?",
@@ -106,12 +106,12 @@ export const LEARNING_PATHS: LearningPath[] = [
       },
       {
         id: "d4",
-        title: "Outils texte, image, voix — panorama",
+        title: "Outils texte, image, voix, panorama",
         minutes: 7,
         body: [
-          "Texte : ChatGPT, Claude, Gemini, Copilot — idéaux pour emails, plans, reformulation, brainstorming.",
-          "Image : Midjourney, DALL·E, Ideogram, Firefly — pour moodboards, visuels réseaux, concepts.",
-          "Voix / audio : Whisper (transcription), ElevenLabs / outils TTS — pour notes, podcasts, accessibilité.",
+          "Texte : ChatGPT, Claude, Gemini, Copilot, idéaux pour emails, plans, reformulation, brainstorming.",
+          "Image : Midjourney, DALL·E, Ideogram, Firefly, pour moodboards, visuels réseaux, concepts.",
+          "Voix / audio : Whisper (transcription), ElevenLabs / outils TTS, pour notes, podcasts, accessibilité.",
           "Choisissez selon le besoin, pas selon la hype. Un outil bien maîtrisé vaut mieux que dix outils à moitié.",
         ],
         tips: [
@@ -249,7 +249,7 @@ export const LEARNING_PATHS: LearningPath[] = [
         ],
         tips: [
           "Mesurez le temps actuel avant/après sur une tâche pilote.",
-          "Impliquez la personne qui fait le travail — pas seulement la direction.",
+          "Impliquez la personne qui fait le travail, pas seulement la direction.",
         ],
         quiz: {
           q: "Par où commencer en entreprise ?",
@@ -270,7 +270,7 @@ export const LEARNING_PATHS: LearningPath[] = [
         body: [
           "Définissez ce qui ne doit jamais aller dans un outil grand public (données clients sensibles, secrets).",
           "Préférez des comptes pro, des politiques claires, et une formation courte aux équipes.",
-          "Documentez les usages autorisés. La gouvernance n'a pas besoin d'être lourde — elle doit être lisible.",
+          "Documentez les usages autorisés. La gouvernance n'a pas besoin d'être lourde, elle doit être lisible.",
         ],
         tips: [
           "Une page A4 de règles > un PDF de 40 pages personne ne lit.",
@@ -284,7 +284,7 @@ export const LEARNING_PATHS: LearningPath[] = [
         body: [
           "Un agent n'est utile que si le process est déjà clair. Sinon, vous automatisez le chaos.",
           "Commencez par des automatisations simples (relances, résumés, tri) avant un agent sur mesure.",
-          "Le ROI se lit en heures gagnées, erreurs évitées, et qualité de service — pas en slides.",
+          "Le ROI se lit en heures gagnées, erreurs évitées, et qualité de service, pas en slides.",
         ],
         tips: [
           "Écrivez le process à la main avant de le confier à un outil.",

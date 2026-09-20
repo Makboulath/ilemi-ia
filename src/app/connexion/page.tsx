@@ -43,7 +43,7 @@ export default async function ConnexionPage({
               >
                 Créer un compte
               </Link>{" "}
-              — c&apos;est gratuit pour accéder au hub et au Studio.
+             , c&apos;est gratuit pour accéder au hub et au Studio.
             </p>
           )}
           <div className="mt-8">

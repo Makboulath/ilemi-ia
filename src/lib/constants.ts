@@ -11,7 +11,7 @@ export const SITE = {
   tagline: "L'agence IA francophone",
   url: "https://ilemi-ia.vercel.app",
   description:
-    "Ilémi.IA accompagne particuliers et entreprises qui veulent adopter l'IA — sans jargon, sans intimidation. Ateliers, parcours et diagnostic entreprise.",
+    "Ilémi.IA accompagne particuliers et entreprises qui veulent adopter l'IA, sans jargon, sans intimidation. Ateliers, parcours et diagnostic entreprise.",
 } as const;
 
 export type OfferProduct = {
@@ -54,7 +54,7 @@ export const OFFERS: OfferPillar[] = [
       {
         titre: "Parcours « Créer avec l'IA »",
         pour: "Porteurs de projet",
-        desc: "Vous arrivez avec une idée. On vous accompagne jusqu'à un livrable qui fonctionne vraiment — pas un slide, un résultat.",
+        desc: "Vous arrivez avec une idée. On vous accompagne jusqu'à un livrable qui fonctionne vraiment, pas un slide, un résultat.",
         inclus: [
           "Accompagnement individuel sur plusieurs semaines",
           "Audit de l'idée et de sa faisabilité",
@@ -71,12 +71,12 @@ export const OFFERS: OfferPillar[] = [
     label: "Entreprises",
     icon: "◈",
     intro:
-      "Pour les PME et organisations qui veulent gagner du temps sans tout casser. On commence par un diagnostic clair — chiffres et priorités, pas de jargon.",
+      "Pour les PME et organisations qui veulent gagner du temps sans tout casser. On commence par un diagnostic clair, chiffres et priorités, pas de jargon.",
     produits: [
       {
         titre: "Diagnostic IA",
         pour: "PME, startups, organisations",
-        desc: "En 2 à 3 semaines, on cartographie où l'IA peut concrètement faire gagner du temps et de l'argent dans votre activité — avec un plan actionnable.",
+        desc: "En 2 à 3 semaines, on cartographie où l'IA peut concrètement faire gagner du temps et de l'argent dans votre activité, avec un plan actionnable.",
         inclus: [
           "Audit de vos process et outils actuels",
           "Priorisation des cas d'usage (impact × effort)",

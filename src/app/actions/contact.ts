@@ -39,7 +39,7 @@ export async function submitContact(
       ok: false,
       fallback: true,
       message:
-        "Le formulaire n'est pas encore configuré. Utilisez Calendly, WhatsApp ou l'email ci-dessous — on répond sous 24h.",
+        "Le formulaire n'est pas encore configuré. Utilisez Calendly, WhatsApp ou l'email ci-dessous, on répond sous 24h.",
     };
   }
 
@@ -55,7 +55,7 @@ export async function submitContact(
         email,
         subject: subject || "Contact ilémi.IA",
         message,
-        _subject: subject || `Contact ilémi.IA — ${name}`,
+        _subject: subject || `Contact ilémi.IA, ${name}`,
       }),
     });
 
@@ -80,7 +80,7 @@ export async function submitContact(
 
     return {
       ok: true,
-      message: "Message envoyé. Merci — on revient vers vous rapidement.",
+      message: "Message envoyé. Merci, on revient vers vous rapidement.",
     };
   } catch {
     return {

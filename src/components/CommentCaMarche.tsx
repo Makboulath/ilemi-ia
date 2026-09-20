@@ -23,7 +23,7 @@ export default function CommentCaMarche() {
             Zéro jargon.
           </h2>
           <p className="mt-4 text-ink/60 leading-relaxed">
-            Un parcours clair pour intégrer l&apos;IA à votre activité — de
+            Un parcours clair pour intégrer l&apos;IA à votre activité, de
             l&apos;audit jusqu&apos;à l&apos;autonomie.
           </p>
         </FadeIn>

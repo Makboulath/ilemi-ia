@@ -104,7 +104,7 @@ export async function ensureAdminUser(): Promise<void> {
       data: { email, passwordHash, role: "ADMIN" },
     });
   } catch {
-    // DB unavailable — login can still fall back to env credentials
+    // DB unavailable, login can still fall back to env credentials
   }
 }
 

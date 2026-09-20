@@ -21,7 +21,7 @@ const karla = Karla({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://ilemi.ia"),
   title: {
-    default: `${SITE.name} — ${SITE.slogan}`,
+    default: `${SITE.name}, ${SITE.slogan}`,
     template: `%s | ${SITE.name}`,
   },
   description: SITE.description,
@@ -33,20 +33,20 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     siteName: SITE.name,
-    title: `${SITE.name} — ${SITE.slogan}`,
+    title: `${SITE.name}, ${SITE.slogan}`,
     description: SITE.description,
     images: [
       {
         url: "/social-image.png",
         width: 1200,
         height: 630,
-        alt: "ilémi.IA — L'IA, enfin chez vous.",
+        alt: "ilémi.IA, L'IA, enfin chez vous.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE.name} — ${SITE.slogan}`,
+    title: `${SITE.name}, ${SITE.slogan}`,
     description: SITE.description,
     images: ["/social-image.png"],
   },

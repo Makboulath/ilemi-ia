@@ -21,7 +21,7 @@ const ZONES: Zone[] = [
     label: "Image",
     icon: "◈",
     title: "Créer des images",
-    desc: "Moodboards, visuels réseaux, concepts de marque — bientôt dans le Studio, avec un accompagnement Ilémi.",
+    desc: "Moodboards, visuels réseaux, concepts de marque, bientôt dans le Studio, avec un accompagnement Ilémi.",
     previewHint: "Décrivez une scène… (démo locale)",
   },
   {
@@ -37,7 +37,7 @@ const ZONES: Zone[] = [
     label: "Son",
     icon: "♩",
     title: "Explorer le son",
-    desc: "Voix off, jingles, ambiances — un atelier audio pensé pour créer sans jargon.",
+    desc: "Voix off, jingles, ambiances, un atelier audio pensé pour créer sans jargon.",
     previewHint: "Ambiance ou voix… (démo locale)",
   },
 ];
@@ -70,7 +70,7 @@ export default function StudioExperience() {
 
   return (
     <div className="relative overflow-hidden bg-ink text-cream">
-      {/* Ambient glow — decorative only, not a content blur */}
+      {/* Ambient glow, decorative only, not a content blur */}
       <div
         aria-hidden
         className="pointer-events-none absolute -left-32 top-20 h-72 w-72 rounded-full bg-terracotta/20 blur-3xl"
@@ -88,7 +88,7 @@ export default function StudioExperience() {
           </h1>
           <p className="mt-5 max-w-2xl text-[1.08rem] leading-relaxed text-cream/65">
             Un atelier créatif immersif pour Image, Vidéo et Son. Les
-            générateurs réels arrivent bientôt — en attendant, explorez
+            générateurs réels arrivent bientôt, en attendant, explorez
             l&apos;expérience et réservez un échange pour être notifié·e.
           </p>
         </FadeIn>
@@ -137,7 +137,7 @@ export default function StudioExperience() {
               Démo locale
             </p>
             <h3 className="mt-1 font-[family-name:var(--font-montserrat)] text-lg font-bold">
-              Essayez un prompt — aperçu simulé
+              Essayez un prompt, aperçu simulé
             </h3>
             <p className="mt-2 max-w-xl text-sm text-cream/50">
               Aucune API externe. C&apos;est une animation placeholder pour

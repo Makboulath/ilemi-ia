@@ -103,7 +103,7 @@ h4 {
   }
 }
 
-/* Grain subtil — opacité très basse pour ne pas voiler le texte */
+/* Grain subtil , opacité très basse pour ne pas voiler le texte */
 .grain-overlay::before {
   content: "";
   pointer-events: none;

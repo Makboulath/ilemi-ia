@@ -68,12 +68,12 @@ export default function Offres() {
           id={`panel-${current.id}`}
           aria-labelledby={`tab-${current.id}`}
         >
-          <p className="mb-8 max-w-2xl text-[1.02rem] leading-relaxed text-ink/65">
+          <p className="mb-5 max-w-2xl text-[1.02rem] leading-relaxed text-ink/65">
             {current.intro}
           </p>
 
-          {current.produits && (
-            <StaggerChildren
+          {current.produits && current.produits.length > 0 && (
+            <div
               className={`grid gap-5 ${
                 current.produits.length === 1
                   ? "md:grid-cols-1 max-w-xl"
@@ -83,17 +83,15 @@ export default function Offres() {
               }`}
             >
               {current.produits.map((p) => (
-                <StaggerItem key={p.titre}>
-                  <ProductCard product={p} />
-                </StaggerItem>
+                <ProductCard key={p.titre} product={p} />
               ))}
-            </StaggerChildren>
+            </div>
           )}
 
           {current.steps && (
             <>
-              {current.produits && (
-                <h3 className="mt-12 mb-5 font-[family-name:var(--font-montserrat)] text-lg font-bold text-ink/80">
+              {current.produits && current.produits.length > 0 && (
+                <h3 className="mt-8 mb-5 font-[family-name:var(--font-montserrat)] text-lg font-bold text-ink/80">
                   Comment on travaille ensuite
                 </h3>
               )}
@@ -118,7 +116,7 @@ export default function Offres() {
           )}
 
           <p className="mt-8 text-sm text-ink/55">
-            30 minutes gratuites pour clarifier votre besoin —{" "}
+            30 minutes gratuites pour clarifier votre besoin,{" "}
             <a
               href={LINKS.calendly}
               target="_blank"

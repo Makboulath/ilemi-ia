@@ -86,7 +86,7 @@ export default function ApprendreHub() {
           Apprendre avec Ilémi
         </h1>
         <p className="mt-4 max-w-2xl text-[1.08rem] leading-relaxed text-ink/65">
-          Un hub de formation clair : parcours Débutant, Créateur ou Pro —
+          Un hub de formation clair : parcours Débutant, Créateur ou Pro,
           leçons en accordéon, quiz instantanés, progression sauvegardée sur
           cet appareil{email ? ` pour ${email}` : ""}.
         </p>
@@ -209,7 +209,7 @@ export default function ApprendreHub() {
             Envie d&apos;un accompagnement réel ?
           </h3>
           <p className="mt-3 max-w-xl text-cream/65">
-            Atelier, parcours Créer avec l&apos;IA, ou diagnostic entreprise —
+            Atelier, parcours Créer avec l&apos;IA, ou diagnostic entreprise,
             on clarifie votre besoin en 30 minutes.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
