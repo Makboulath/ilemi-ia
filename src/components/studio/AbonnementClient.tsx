@@ -15,6 +15,7 @@ import {
 /** Login/signup return URL that can resume a pack purchase. */
 function authReturnUrl(packId?: string) {
   const next = packId ? `/abonnement?pack=${packId}` : "/abonnement";
+  // Single encodeURIComponent — do not pre-encode for <Link> (Next encodes once).
   return `/connexion?next=${encodeURIComponent(next)}`;
 }
 
@@ -131,12 +132,19 @@ export default function AbonnementClient() {
     }
   }, [applyOpenOrder]);
 
+  const packId = params.get("pack");
+  const stripeFlag = params.get("success") === "1"
+    ? "success"
+    : params.get("cancel") === "1"
+      ? "cancel"
+      : null;
+
   useEffect(() => {
-    if (params.get("success") === "1") {
+    if (stripeFlag === "success") {
       setStripeMsg(
         "Paiement Stripe reçu (ou session créée). Votre plan Pro sera activé via le webhook.",
       );
-    } else if (params.get("cancel") === "1") {
+    } else if (stripeFlag === "cancel") {
       setStripeMsg("Paiement Stripe annulé.");
     }
 
@@ -145,7 +153,6 @@ export default function AbonnementClient() {
       const result = await refreshOrders();
       if (cancelled || result === false) return;
 
-      const packId = params.get("pack");
       if (!packId) return;
 
       // Already have a pending/submitted order → show it, drop ?pack=
@@ -156,40 +163,64 @@ export default function AbonnementClient() {
 
       // Resume pack purchase after login/signup (?pack=essai|createur|studio)
       const pack = getPack(packId);
-      if (!pack) return;
+      if (!pack) {
+        router.replace("/abonnement", { scroll: false });
+        return;
+      }
 
       const lockKey = `ilemi-abo-resume:${packId}`;
+      let shouldCreate = true;
       try {
-        if (sessionStorage.getItem(lockKey) === "done") {
+        const lock = sessionStorage.getItem(lockKey);
+        if (lock === "done") {
           router.replace("/abonnement", { scroll: false });
           return;
         }
+        if (lock === "pending") {
+          // Sibling effect / Strict Mode — wait for in-flight create, then refresh
+          shouldCreate = false;
+        } else {
+          sessionStorage.setItem(lockKey, "pending");
+        }
       } catch {
-        /* private mode */
+        if (resumeLock.current) shouldCreate = false;
+        else resumeLock.current = true;
       }
-      if (resumeLock.current) return;
-      resumeLock.current = true;
-      router.replace("/abonnement", { scroll: false });
-      if (cancelled) {
-        resumeLock.current = false;
-        return;
-      }
-      const created = await createOrder(pack);
-      if (created) {
-        try {
-          sessionStorage.setItem(lockKey, "done");
-        } catch {
-          /* ignore */
+
+      if (shouldCreate) {
+        // Create FIRST, then clean URL — replacing ?pack= early cancelled the
+        // effect (params change) and aborted createOrder → blank page / no USSD.
+        const created = await createOrder(pack);
+        if (created) {
+          try {
+            sessionStorage.setItem(lockKey, "done");
+          } catch {
+            /* ignore */
+          }
+        } else {
+          try {
+            sessionStorage.removeItem(lockKey);
+          } catch {
+            /* ignore */
+          }
+          resumeLock.current = false;
+          return;
         }
       } else {
-        resumeLock.current = false;
+        await new Promise((r) => setTimeout(r, 600));
+        if (cancelled) return;
+        await refreshOrders();
+      }
+
+      if (!cancelled) {
+        router.replace("/abonnement", { scroll: false });
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [params, refreshOrders, router, createOrder]);
+  }, [packId, stripeFlag, refreshOrders, router, createOrder]);
 
   async function handleCopy(label: string, value: string) {
     const ok = await copyText(value);
@@ -285,19 +316,19 @@ export default function AbonnementClient() {
         </p>
         {loggedIn === false && (
           <p className="mt-4 rounded-xl border border-terracotta/25 bg-terracotta/5 px-4 py-3 text-sm text-ink/70">
-            <Link
+            <a
               href={authReturnUrl()}
               className="font-semibold text-terracotta underline-offset-2 hover:underline"
             >
               Connectez-vous
-            </Link>{" "}
+            </a>{" "}
             ou{" "}
-            <Link
+            <a
               href={`/inscription?next=${encodeURIComponent("/abonnement")}`}
               className="font-semibold text-terracotta underline-offset-2 hover:underline"
             >
               créez un compte
-            </Link>{" "}
+            </a>{" "}
             pour acheter un pack et recevoir votre code ILM-XXXX.
           </p>
         )}
@@ -342,12 +373,12 @@ export default function AbonnementClient() {
                   …
                 </button>
               ) : loggedIn === false ? (
-                <Link
+                <a
                   href={authReturnUrl(pack.id)}
                   className="btn-primary mt-6 w-full text-center"
                 >
                   Se connecter pour acheter
-                </Link>
+                </a>
               ) : (
                 <button
                   type="button"

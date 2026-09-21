@@ -87,6 +87,14 @@ export async function ensureDb(): Promise<PrismaClient> {
         prisma,
         `ALTER TABLE "User" ADD COLUMN "stripeCustomerId" TEXT`
       );
+      await tryAlter(
+        prisma,
+        `ALTER TABLE "User" ADD COLUMN "passwordResetHash" TEXT`
+      );
+      await tryAlter(
+        prisma,
+        `ALTER TABLE "User" ADD COLUMN "passwordResetExpires" DATETIME`
+      );
 
       await prisma.$executeRawUnsafe(`
         CREATE TABLE IF NOT EXISTS "PageView" (

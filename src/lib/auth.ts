@@ -1,3 +1,4 @@
+import { createHash, randomBytes } from "crypto";
 import { SignJWT, jwtVerify } from "jose";
 import { hash, compare } from "bcryptjs";
 import { cookies } from "next/headers";
@@ -145,4 +146,22 @@ export async function authenticate(
   }
 
   return null;
+}
+
+const RESET_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+/** Raw token for email + SHA-256 hash for DB storage. */
+export function createPasswordResetToken(): {
+  rawToken: string;
+  tokenHash: string;
+  expiresAt: Date;
+} {
+  const rawToken = randomBytes(32).toString("hex");
+  const tokenHash = hashResetToken(rawToken);
+  const expiresAt = new Date(Date.now() + RESET_TTL_MS);
+  return { rawToken, tokenHash, expiresAt };
+}
+
+export function hashResetToken(rawToken: string): string {
+  return createHash("sha256").update(rawToken).digest("hex");
 }

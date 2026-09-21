@@ -3,6 +3,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthForm from "@/components/AuthForm";
+import { safeNextPath } from "@/lib/safe-next";
 
 export const metadata: Metadata = {
   title: "Connexion",
@@ -16,7 +17,7 @@ export default async function ConnexionPage({
   searchParams: Promise<{ next?: string }>;
 }) {
   const sp = await searchParams;
-  const next = typeof sp.next === "string" ? sp.next : "/espace";
+  const next = safeNextPath(sp.next, "/espace");
   const gated =
     next.startsWith("/apprendre") ||
     next.startsWith("/studio") ||

@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { getSession } from "@/lib/auth";
 import { LINKS } from "@/lib/constants";
 import LogoutButton from "@/components/LogoutButton";
+import ChangePasswordForm from "@/components/ChangePasswordForm";
 
 export const metadata: Metadata = {
   title: "Mon espace",
@@ -98,6 +99,10 @@ export default async function EspacePage() {
               </Link>
             )}
             <LogoutButton />
+          </div>
+
+          <div className="mt-12 rounded-2xl border border-ink/10 bg-white p-6">
+            <ChangePasswordForm />
           </div>
         </div>
       </main>

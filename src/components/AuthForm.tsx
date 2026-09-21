@@ -2,9 +2,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { safeNextPath } from "@/lib/safe-next";
 
 type Mode = "login" | "register";
+
+function resolveDest(
+  nextPath: string,
+  role: string | undefined,
+  mode: Mode
+): string {
+  const safe = safeNextPath(nextPath, "/espace");
+  // Admins: honor explicit deep-links (abonnement, studio, apprendre…).
+  // Only bounce to /admin when next is the generic member home.
+  if (role === "ADMIN" && mode === "login") {
+    if (safe === "/espace" || safe === "/") return "/admin";
+    return safe;
+  }
+  return safe;
+}
 
 export default function AuthForm({
   mode,
@@ -13,7 +28,6 @@ export default function AuthForm({
   mode: Mode;
   nextPath: string;
 }) {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -36,22 +50,17 @@ export default function AuthForm({
         setError(data.message || "Une erreur est survenue.");
         return;
       }
-      const dest =
-        data.role === "ADMIN" && mode === "login"
-          ? nextPath.startsWith("/admin")
-            ? nextPath
-            : "/admin"
-          : nextPath.startsWith("/")
-            ? nextPath
-            : "/espace";
-      router.push(dest);
-      router.refresh();
+      const dest = resolveDest(nextPath, data.role, mode);
+      // Full navigation so the session cookie is reliably picked up
+      // and ?pack= resume on /abonnement runs on a clean mount.
+      window.location.assign(dest);
     } catch {
       setError("Impossible de contacter le serveur.");
-    } finally {
       setPending(false);
     }
   }
+
+  const nextEnc = encodeURIComponent(safeNextPath(nextPath, "/espace"));
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
@@ -70,9 +79,19 @@ export default function AuthForm({
         />
       </div>
       <div>
-        <label htmlFor="password" className="mb-1.5 block text-sm font-medium">
-          Mot de passe
-        </label>
+        <div className="mb-1.5 flex items-center justify-between gap-2">
+          <label htmlFor="password" className="block text-sm font-medium">
+            Mot de passe
+          </label>
+          {mode === "login" && (
+            <Link
+              href="/mot-de-passe-oublie"
+              className="text-xs font-medium text-terracotta underline-offset-2 hover:underline"
+            >
+              Mot de passe oublié ?
+            </Link>
+          )}
+        </div>
         <input
           id="password"
           type="password"
@@ -104,7 +123,7 @@ export default function AuthForm({
           <>
             Pas encore de compte ?{" "}
             <Link
-              href={`/inscription?next=${encodeURIComponent(nextPath)}`}
+              href={`/inscription?next=${nextEnc}`}
               className="font-medium text-terracotta underline-offset-2 hover:underline"
             >
               S&apos;inscrire
@@ -114,7 +133,7 @@ export default function AuthForm({
           <>
             Déjà inscrit·e ?{" "}
             <Link
-              href={`/connexion?next=${encodeURIComponent(nextPath)}`}
+              href={`/connexion?next=${nextEnc}`}
               className="font-medium text-terracotta underline-offset-2 hover:underline"
             >
               Se connecter

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthForm from "@/components/AuthForm";
+import { safeNextPath } from "@/lib/safe-next";
 
 export const metadata: Metadata = {
   title: "Inscription",
@@ -15,10 +16,7 @@ export default async function InscriptionPage({
   searchParams: Promise<{ next?: string }>;
 }) {
   const sp = await searchParams;
-  const next =
-    typeof sp.next === "string" && sp.next.startsWith("/")
-      ? sp.next
-      : "/espace";
+  const next = safeNextPath(sp.next, "/espace");
 
   return (
     <>
