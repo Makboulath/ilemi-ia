@@ -111,9 +111,11 @@ export default function AuthForm({
           {error}
         </p>
       )}
-      <button type="submit" disabled={pending} className="btn-primary w-full">
+      <button type="submit" disabled={pending} aria-busy={pending} className="btn-primary w-full">
         {pending
-          ? "…"
+          ? mode === "login"
+            ? "Connexion…"
+            : "Création du compte…"
           : mode === "login"
             ? "Se connecter"
             : "Créer mon compte"}

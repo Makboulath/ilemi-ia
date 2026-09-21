@@ -9,9 +9,9 @@ export default function CommentCaMarche() {
     <section
       id="process"
       aria-labelledby="process-heading"
-      className="bg-cream text-ink py-16 md:py-28"
+      className="bg-cream text-ink py-14 sm:py-16 md:py-28"
     >
-      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
+      <div className="mx-auto max-w-[1200px] px-4 sm:px-5 md:px-8">
         <FadeIn className="mb-12 max-w-xl">
           <p className="section-label">Comment ça marche</p>
           <h2

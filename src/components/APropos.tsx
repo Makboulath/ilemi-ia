@@ -1,30 +1,32 @@
 import Image from "next/image";
 import { VALUES } from "@/lib/constants";
+import FadeIn from "@/components/motion/FadeIn";
 
 export default function APropos() {
   return (
     <section
       id="apropos"
       aria-labelledby="about-heading"
-      className="bg-navy py-16 md:py-28"
+      className="bg-navy py-14 sm:py-16 md:py-28"
     >
-      <div className="mx-auto grid max-w-[1200px] items-start gap-10 px-5 md:grid-cols-2 md:gap-16 md:px-8">
-        <div className="relative overflow-hidden">
+      <div className="mx-auto grid max-w-[1200px] items-start gap-8 px-4 sm:gap-10 sm:px-5 md:grid-cols-2 md:gap-16 md:px-8">
+        <FadeIn className="img-zoom relative overflow-hidden rounded-sm">
           <Image
             src="/photo-1.jpg"
-            alt="Makboulath Raoufou, fondatrice d'Ilémi.IA"
+            alt="Makboulath Raoufou, fondatrice d'ilémi.IA"
             width={800}
             height={1000}
-            className="h-[280px] w-full object-cover object-top md:h-[500px]"
+            className="h-[260px] w-full object-cover object-top sm:h-[320px] md:h-[500px]"
+            sizes="(max-width: 768px) 100vw, 50vw"
             priority={false}
           />
           <div
             aria-hidden
             className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-navy to-transparent"
           />
-        </div>
+        </FadeIn>
 
-        <div>
+        <FadeIn delay={0.1}>
           <p className="section-label">À propos</p>
           <h2
             id="about-heading"
@@ -64,8 +66,7 @@ export default function APropos() {
               </div>
             ))}
           </div>
-
-        </div>
+        </FadeIn>
       </div>
     </section>
   );

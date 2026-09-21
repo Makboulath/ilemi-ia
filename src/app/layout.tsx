@@ -85,6 +85,9 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${montserrat.variable} ${karla.variable}`}>
       <body className="antialiased font-[family-name:var(--font-karla)]">
+        <a href="#contenu-principal" className="skip-link">
+          Aller au contenu
+        </a>
         <JsonLd />
         <PageTracker />
         {children}

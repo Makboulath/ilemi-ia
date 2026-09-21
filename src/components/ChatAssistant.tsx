@@ -132,6 +132,7 @@ export default function ChatAssistant() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Votre message..."
+              aria-label="Votre message"
               maxLength={1200}
               disabled={busy}
               className="min-w-0 flex-1 rounded-lg bg-[#1e1e28] px-3 py-2 text-sm text-white placeholder:text-white/40 outline-none focus:ring-1 focus:ring-[#C1622D]"
@@ -155,7 +156,7 @@ export default function ChatAssistant() {
         aria-label={open ? "Fermer l'assistant" : "Ouvrir l'assistant Ilémi.IA"}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-[#C1622D] text-xl font-bold text-white shadow-lg transition hover:scale-105 hover:brightness-110"
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-[#C1622D] text-xl font-bold text-white shadow-lg transition hover:brightness-110 motion-safe:hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
       >
         {open ? "×" : "💬"}
       </button>

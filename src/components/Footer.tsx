@@ -12,11 +12,11 @@ const FOOTER_NAV = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-cream/10 bg-ink py-10">
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-5 md:flex-row md:items-center md:justify-between md:px-8">
+    <footer className="border-t border-cream/10 bg-ink py-10 md:py-12">
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 sm:px-5 md:flex-row md:items-center md:justify-between md:px-8">
         <div className="flex items-center gap-3">
           <Image
-            src="/logo-mark.png"
+            src="/logo-mark-sm.png"
             alt=""
             width={32}
             height={32}
@@ -33,7 +33,7 @@ export default function Footer() {
         </div>
 
         <nav
-          className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-cream/55"
+          className="flex flex-wrap gap-x-5 gap-y-2.5 text-sm text-cream/55"
           aria-label="Pied de page"
         >
           {FOOTER_NAV.map((item) => (

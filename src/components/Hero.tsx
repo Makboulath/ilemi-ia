@@ -38,7 +38,7 @@ export default function Hero() {
         }}
       />
 
-      <div className="relative mx-auto flex min-h-[78vh] max-w-[1200px] flex-col justify-center px-5 py-20 md:px-8 md:py-28">
+      <div className="relative mx-auto flex min-h-[min(78vh,720px)] max-w-[1200px] flex-col justify-center px-4 py-16 sm:px-5 sm:py-20 md:px-8 md:py-28">
         <motion.p
           className="section-label mb-4"
           initial={reduce ? false : { opacity: 0, y: 18 }}
@@ -49,7 +49,7 @@ export default function Hero() {
         </motion.p>
         <motion.h1
           id="hero-heading"
-          className="max-w-3xl font-[family-name:var(--font-montserrat)] text-[clamp(2.4rem,6vw,4.25rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-cream drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]"
+          className="max-w-3xl font-[family-name:var(--font-montserrat)] text-[clamp(2.15rem,7vw,4.25rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-cream drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]"
           initial={reduce ? false : { opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1, ease }}
@@ -68,7 +68,7 @@ export default function Hero() {
           l&apos;intégrer dans votre entreprise, vous êtes au bon endroit.
         </motion.p>
         <motion.div
-          className="mt-9 flex flex-row flex-nowrap items-center gap-3 overflow-x-auto pb-1"
+          className="mt-8 flex w-full max-w-md flex-col gap-3 sm:mt-9 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center"
           initial={reduce ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.32, ease }}
@@ -77,11 +77,11 @@ export default function Hero() {
             href={LINKS.calendly}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-primary shrink-0"
+            className="btn-primary w-full sm:w-auto"
           >
             Prendre rendez-vous
           </a>
-          <a href="/#offre" className="btn-ghost shrink-0">
+          <a href="/#offre" className="btn-ghost w-full sm:w-auto">
             Découvrir nos offres
           </a>
         </motion.div>

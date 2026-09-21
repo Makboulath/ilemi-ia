@@ -11,9 +11,9 @@ export default function Offres() {
     <section
       id="offre"
       aria-labelledby="offre-heading"
-      className="bg-cream text-ink py-16 md:py-28"
+      className="bg-cream text-ink py-14 sm:py-16 md:py-28"
     >
-      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
+      <div className="mx-auto max-w-[1200px] px-4 sm:px-5 md:px-8">
         <motion.div
           className="mb-10 max-w-xl md:mb-14"
           initial={reduce ? false : { opacity: 0, y: 24 }}
@@ -36,13 +36,22 @@ export default function Offres() {
           </p>
         </motion.div>
 
-        <StaggerChildren className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
+        <StaggerChildren className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-3 md:gap-6">
           {OFFERS.map((pillar) => {
-            const highlight = pillar.produits?.[0];
+            const products = pillar.produits ?? [];
+            const highlight =
+              products.find((p) => p.accent) ??
+              products.find((p) => p.badge) ??
+              products[0];
             return (
               <StaggerItem key={pillar.id} className="h-full">
-                <article className="card-lift flex h-full flex-col rounded-2xl border border-ink/10 bg-white p-6 md:p-7">
-                  <p className="mb-3 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-terracotta">
+                <article className="card-lift relative flex h-full flex-col rounded-2xl border border-ink/10 bg-white p-5 sm:p-6 md:p-7">
+                  {highlight?.badge ? (
+                    <span className="absolute right-4 top-4 rounded-full bg-terracotta/10 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wide text-terracotta">
+                      {highlight.badge}
+                    </span>
+                  ) : null}
+                  <p className="mb-3 pr-20 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-terracotta">
                     <span className="mr-1.5" aria-hidden>
                       {pillar.icon}
                     </span>
@@ -76,7 +85,7 @@ export default function Offres() {
                     href={LINKS.calendly}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-auto block rounded-[3px] border-[1.5px] border-terracotta px-5 py-3 text-center text-[0.8rem] font-[family-name:var(--font-montserrat)] font-bold text-terracotta transition hover:bg-terracotta/5"
+                    className="mt-auto block min-h-11 rounded-[3px] border-[1.5px] border-terracotta px-5 py-3 text-center text-[0.8rem] font-[family-name:var(--font-montserrat)] font-bold text-terracotta transition hover:bg-terracotta/5 active:scale-[0.98]"
                   >
                     En savoir plus
                   </a>

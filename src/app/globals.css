@@ -18,6 +18,15 @@ html {
   html {
     scroll-behavior: auto;
   }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 body {
@@ -33,9 +42,39 @@ h4 {
   font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Sticky header offset for in-page anchors */
+[id] {
+  scroll-margin-top: 5.5rem;
+}
+
 ::selection {
   background: color-mix(in srgb, var(--color-terracotta) 55%, transparent);
   color: var(--color-cream);
+}
+
+/* Keyboard focus — visible, brand-aligned */
+:focus-visible {
+  outline: 2px solid var(--color-terracotta);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100%;
+  z-index: 100;
+  border-radius: 0.25rem;
+  background: var(--color-terracotta);
+  color: var(--color-cream);
+  font-family: var(--font-heading), sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  padding: 0.75rem 1.1rem;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 1rem;
 }
 
 .btn-primary {
@@ -49,11 +88,27 @@ h4 {
   font-size: 0.875rem;
   padding: 0.85rem 1.35rem;
   border-radius: 0.25rem;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  min-height: 2.75rem;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .btn-primary:hover {
   background: color-mix(in srgb, var(--color-terracotta) 88%, black);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-terracotta) 35%, transparent);
+}
+
+.btn-primary:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .btn-ghost {
@@ -67,12 +122,26 @@ h4 {
   font-size: 0.875rem;
   padding: 0.85rem 1.35rem;
   border-radius: 0.25rem;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  min-height: 2.75rem;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .btn-ghost:hover {
   border-color: var(--color-cream);
   background: color-mix(in srgb, var(--color-cream) 6%, transparent);
+}
+
+.btn-ghost:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-ghost:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .section-label {
@@ -86,8 +155,10 @@ h4 {
 }
 
 .card-lift {
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.35s ease;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease,
+    border-color 0.25s ease;
 }
 
 .card-lift:hover {
@@ -95,15 +166,33 @@ h4 {
   box-shadow: 0 20px 48px rgba(20, 20, 26, 0.12);
 }
 
+.img-zoom {
+  overflow: hidden;
+}
+
+.img-zoom img {
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.img-zoom:hover img {
+  transform: scale(1.04);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .card-lift,
-  .card-lift:hover {
+  .card-lift:hover,
+  .btn-primary:hover,
+  .btn-primary:active,
+  .btn-ghost:hover,
+  .btn-ghost:active,
+  .img-zoom:hover img {
     transition: none;
     transform: none;
+    box-shadow: none;
   }
 }
 
-/* Grain subtil , opacité très basse pour ne pas voiler le texte */
+/* Grain subtil — opacité très basse pour ne pas voiler le texte */
 .grain-overlay::before {
   content: "";
   pointer-events: none;

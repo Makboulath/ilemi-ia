@@ -1,15 +1,16 @@
 import ContactForm from "@/components/ContactForm";
 import { LINKS } from "@/lib/constants";
+import FadeIn from "@/components/motion/FadeIn";
 
 export default function Contact() {
   return (
     <section
       id="contact"
       aria-labelledby="contact-heading"
-      className="bg-ink py-16 md:py-28"
+      className="bg-ink py-14 sm:py-16 md:py-28"
     >
-      <div className="mx-auto grid max-w-[1200px] gap-12 px-5 md:grid-cols-2 md:gap-16 md:px-8">
-        <div>
+      <div className="mx-auto grid max-w-[1200px] gap-10 px-4 sm:gap-12 sm:px-5 md:grid-cols-2 md:gap-16 md:px-8">
+        <FadeIn>
           <p className="section-label">Contact</p>
           <h2
             id="contact-heading"
@@ -22,12 +23,12 @@ export default function Contact() {
             Gratuit, sans engagement.
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
             <a
               href={LINKS.calendly}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary"
+              className="btn-primary w-full sm:w-auto"
             >
               Réserver sur Calendly
             </a>
@@ -35,7 +36,7 @@ export default function Contact() {
               href={LINKS.whatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-ghost"
+              className="btn-ghost w-full sm:w-auto"
             >
               Écrire sur WhatsApp
             </a>
@@ -50,9 +51,11 @@ export default function Contact() {
               {LINKS.email}
             </a>
           </p>
-        </div>
+        </FadeIn>
 
-        <ContactForm />
+        <FadeIn delay={0.1}>
+          <ContactForm />
+        </FadeIn>
       </div>
     </section>
   );

@@ -41,6 +41,15 @@ export default function Header() {
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   const accountHref = user
     ? user.role === "ADMIN"
       ? "/admin"
@@ -57,7 +66,7 @@ export default function Header() {
       <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-5 py-3 md:px-8">
         <Link href="/" className="flex shrink-0 items-center gap-2.5">
           <Image
-            src="/logo-mark.png"
+            src="/logo-mark-sm.png"
             alt=""
             width={36}
             height={36}
@@ -90,10 +99,18 @@ export default function Header() {
           </Link>
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <a
+            href={LINKS.calendly}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary hidden !px-4 !py-2.5 text-[0.8rem] md:inline-flex"
+          >
+            Rendez-vous
+          </a>
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded border border-ink/15 lg:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded border border-ink/15 transition hover:bg-ink/5 lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
@@ -138,7 +155,7 @@ export default function Header() {
                 >
                   <Link
                     href={item.href}
-                    className="block py-2.5 text-[1.05rem] text-ink/85"
+                    className="block rounded-md py-3 text-[1.05rem] text-ink/85 transition hover:bg-ink/5"
                     onClick={() => setOpen(false)}
                   >
                     {item.label}
@@ -147,7 +164,7 @@ export default function Header() {
               ))}
               <Link
                 href={accountHref}
-                className="py-2.5 font-medium text-ink"
+                className="rounded-md py-3 font-medium text-ink transition hover:bg-ink/5"
                 onClick={() => setOpen(false)}
               >
                 {accountLabel}
