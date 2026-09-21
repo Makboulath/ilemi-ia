@@ -75,9 +75,9 @@ Variables à définir en local (`.env.local`) et sur Vercel :
 | `ADMIN_EMAIL` | Email admin (ex. makboulathraoufou@gmail.com) |
 | `ADMIN_PASSWORD` | Mot de passe admin — **uniquement en env, jamais dans git** |
 | `AUTH_SECRET` | Secret JWT (chaîne aléatoire longue) |
-| `DATABASE_URL` | SQLite local : `file:./prisma/dev.db` |
+| `DATABASE_URL` | PostgreSQL URL (Neon / Vercel Postgres), ex. `postgresql://USER:PASSWORD@HOST/DB?sslmode=require` |
 
-Sur Vercel, SQLite utilise `/tmp/ilemi.db` (éphémère par instance). Pour la production durable, migrer vers Postgres plus tard.
+Après avoir créé la base : `npx prisma migrate deploy` (ou `npx prisma db push` sur une base vide). Voir `prisma/migrations/`.
 
 Routes : `/connexion`, `/inscription`, `/espace` (membre), `/admin` (ADMIN), `/apprendre`.
 

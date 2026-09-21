@@ -66,9 +66,9 @@ export default async function AdminPage() {
 
           {!dbOk && (
             <p className="mt-6 rounded border border-terracotta/30 bg-terracotta/10 px-4 py-3 text-sm">
-              Base de données temporairement indisponible (SQLite éphémère sur
-              Vercel). Les compteurs peuvent être à zéro après un redémarrage
-              d&apos;instance. Prévoir Postgres pour la production.
+              Base de données temporairement indisponible. Vérifiez
+              DATABASE_URL (PostgreSQL) et que les migrations ont été
+              appliquées (prisma migrate deploy).
             </p>
           )}
 

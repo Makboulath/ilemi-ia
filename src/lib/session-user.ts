@@ -8,10 +8,10 @@ export async function requireSession(): Promise<SessionPayload | null> {
 
 /**
  * Resolve the Prisma User for the current session.
- * A valid JWT is authoritative: if the row is missing (e.g. ephemeral
- * /tmp SQLite on another serverless instance right after login), recreate
- * it from the session claims so APIs do not 401 and bounce the user to
- * /connexion while the cookie is still valid.
+ * A valid JWT is authoritative: if the row is missing (e.g. after a fresh
+ * Postgres provision before the user row was created), recreate it from
+ * the session claims so APIs do not 401 and bounce the user to /connexion
+ * while the cookie is still valid.
  */
 export async function requireDbUser(): Promise<
   { session: SessionPayload; user: User } | null
