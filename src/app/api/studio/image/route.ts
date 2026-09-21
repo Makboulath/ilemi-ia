@@ -40,7 +40,6 @@ export async function POST(request: Request) {
 
   const auth = await requireDbUser();
 
-  // Guest / session without DB row: free Pollinations demo (no credits, no history)
   if (!auth) {
     const result = pollinationsImageUrl(prompt);
     return NextResponse.json({
@@ -55,18 +54,18 @@ export async function POST(request: Request) {
     const prisma = await ensureDb();
     const user = await ensureWallet(prisma, auth.user.id);
     if (user.credits < IMAGE_CREDIT_COST) {
-      // Still allow free Pollinations so Studio never feels broken
       const result = pollinationsImageUrl(prompt);
       return NextResponse.json({
         ok: true,
         url: result.url,
         provider: result.provider,
         wallet: snapshot(user),
-        note: "Mode gratuit Pollinations (crédits épuisés).",
+        note: "Mode gratuit Pollinations HD (crédits épuisés).",
       });
     }
 
-    const result = await generateImage(prompt, { preferFree: true });
+    // Try Gemini (if quota), else improved Pollinations
+    const result = await generateImage(prompt, { preferFree: false });
     const updated = await prisma.user.update({
       where: { id: user.id },
       data: { credits: { decrement: IMAGE_CREDIT_COST } },
@@ -87,14 +86,13 @@ export async function POST(request: Request) {
       wallet: snapshot(updated),
     });
   } catch {
-    // DB flaky on Vercel SQLite — never block image demo
     const result = pollinationsImageUrl(prompt);
     return NextResponse.json({
       ok: true,
       url: result.url,
       provider: result.provider,
       guest: true,
-      note: "Mode démo (base temporaire indisponible).",
+      note: "Mode démo HD (base temporaire indisponible).",
     });
   }
 }

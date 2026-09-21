@@ -13,14 +13,44 @@ function geminiKey(): string | undefined {
   );
 }
 
-/** Free open-source Flux via Pollinations — hotlink for the browser (no key, unlimited soft-cap). */
+const QUALITY_SUFFIX =
+  ", photographie éditoriale haute définition, lumière douce naturelle, détails nets, peau réaliste, composition soignée, 85mm";
+
+const NEGATIVE =
+  "blurry, lowres, low quality, jpeg artifacts, distorted face, extra fingers, watermark, text, logo, ugly, noise, oversaturated";
+
+/** Enrich a short user prompt without duplicating quality tags. */
+export function enrichImagePrompt(prompt: string): string {
+  const clean = prompt.replace(/\s+/g, " ").trim().slice(0, 320);
+  if (/haute définition|highly detailed|8k|photoreal|éditorial|cinematic/i.test(clean)) {
+    return clean;
+  }
+  return `${clean}${QUALITY_SUFFIX}`.slice(0, 480);
+}
+
+/**
+ * Free Pollinations (anonymous).
+ * Note: free tier currently serves DreamShaper/Sana — not full Flux.
+ * We push quality via enhance + HD + negative prompt + enriched prompt.
+ */
 export function pollinationsImageUrl(prompt: string): GenResult {
-  const clean = prompt.replace(/\s+/g, " ").trim().slice(0, 400);
+  const enriched = enrichImagePrompt(prompt);
   const seed = Date.now() % 100000;
+  const params = new URLSearchParams({
+    width: "1024",
+    height: "1024",
+    nologo: "true",
+    enhance: "true",
+    quality: "hd",
+    model: "sana",
+    seed: String(seed),
+    private: "true",
+    negative_prompt: NEGATIVE,
+  });
   const url =
-    `https://image.pollinations.ai/prompt/${encodeURIComponent(clean)}` +
-    `?width=1024&height=768&nologo=true&model=flux&seed=${seed}`;
-  return { url, provider: "pollinations:flux" };
+    `https://image.pollinations.ai/prompt/${encodeURIComponent(enriched)}` +
+    `?${params.toString()}`;
+  return { url, provider: "pollinations:sana+hd" };
 }
 
 /** Gemini native image generation (Google AI Studio). */
@@ -42,7 +72,7 @@ async function generateImageGemini(prompt: string): Promise<GenResult> {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          contents: [{ role: "user", parts: [{ text: enrichImagePrompt(prompt) }] }],
           generationConfig: {
             responseModalities: ["TEXT", "IMAGE"],
           },
@@ -90,24 +120,18 @@ export async function generateImage(
   prompt: string,
   opts?: { preferFree?: boolean }
 ): Promise<GenResult> {
-  const preferFree = opts?.preferFree !== false;
-  const errors: string[] = [];
+  const preferFree = opts?.preferFree === true;
 
-  // Free path first when demo / guest / no paid budget
-  if (preferFree) {
-    return pollinationsImageUrl(prompt);
-  }
-
-  if (geminiKey()) {
+  if (!preferFree && geminiKey()) {
     try {
       return await generateImageGemini(prompt);
-    } catch (e) {
-      errors.push(e instanceof Error ? e.message : String(e));
+    } catch {
+      /* fall through to Pollinations */
     }
   }
 
   const fal = process.env.FAL_KEY?.trim();
-  if (fal) {
+  if (!preferFree && fal) {
     try {
       const res = await fetch("https://fal.run/fal-ai/flux/dev", {
         method: "POST",
@@ -116,54 +140,21 @@ export async function generateImage(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          prompt,
-          image_size: "landscape_4_3",
+          prompt: enrichImagePrompt(prompt),
+          image_size: "square_hd",
           num_images: 1,
         }),
       });
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        throw new Error(`FAL_IMAGE_FAILED:${res.status}:${text.slice(0, 200)}`);
+      if (res.ok) {
+        const data = (await res.json()) as { images?: { url: string }[] };
+        const url = data.images?.[0]?.url;
+        if (url) return { url, provider: "fal" };
       }
-      const data = (await res.json()) as { images?: { url: string }[] };
-      const url = data.images?.[0]?.url;
-      if (!url) throw new Error("FAL_IMAGE_NO_URL");
-      return { url, provider: "fal" };
-    } catch (e) {
-      errors.push(e instanceof Error ? e.message : String(e));
+    } catch {
+      /* fall through */
     }
   }
 
-  const openai = process.env.OPENAI_API_KEY?.trim();
-  if (openai) {
-    try {
-      const res = await fetch("https://api.openai.com/v1/images/generations", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${openai}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "dall-e-3",
-          prompt,
-          n: 1,
-          size: "1024x1024",
-        }),
-      });
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        throw new Error(`OPENAI_IMAGE_FAILED:${res.status}:${text.slice(0, 200)}`);
-      }
-      const data = (await res.json()) as { data?: { url?: string }[] };
-      const url = data.data?.[0]?.url;
-      if (!url) throw new Error("OPENAI_IMAGE_NO_URL");
-      return { url, provider: "openai" };
-    } catch (e) {
-      errors.push(e instanceof Error ? e.message : String(e));
-    }
-  }
-
-  // Always available free fallback
   return pollinationsImageUrl(prompt);
 }
 
