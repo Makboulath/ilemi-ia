@@ -5,9 +5,9 @@ import Footer from "@/components/Footer";
 import AbonnementClient from "@/components/studio/AbonnementClient";
 
 export const metadata: Metadata = {
-  title: "Abonnement Studio Pro",
+  title: "Acheter des crédits",
   description:
-    "Passez Pro pour recharger vos crédits Studio Ilémi chaque mois.",
+    "Achetez des crédits Studio Ilémi par Mobile Money (Moov, MTN, Celtiis).",
   robots: { index: false, follow: false },
 };
 

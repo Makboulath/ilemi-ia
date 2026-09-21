@@ -6,6 +6,17 @@ export const VIDEO_CREDIT_COST = 1;
 export const VIDEO_DAILY_CAP = 2;
 export const PRO_MONTHLY_CREDITS = 50;
 
+export {
+  CREDIT_PACKS,
+  DEFAULT_MM_MERCHANT,
+  getPack,
+  makeOrderCode,
+  merchantNumber,
+  moovUssd,
+  type CreditPack,
+  type CreditPackId,
+} from "@/lib/studio/packs";
+
 /** Calendar day in Africa/Porto-Novo (UTC+1, no DST). */
 export function portoNovoDateKey(d = new Date()): string {
   const formatter = new Intl.DateTimeFormat("en-CA", {
@@ -51,6 +62,8 @@ export function videosLeftToday(user: User): number {
 
 export type WalletSnapshot = {
   credits: number;
+  imageCredits: number;
+  videoCredits: number;
   plan: string;
   videosLeftToday: number;
   videoDailyCap: number;
@@ -59,6 +72,8 @@ export type WalletSnapshot = {
 export function snapshot(user: User): WalletSnapshot {
   return {
     credits: user.credits,
+    imageCredits: user.credits,
+    videoCredits: user.videoCredits ?? 0,
     plan: user.plan,
     videosLeftToday: videosLeftToday(user),
     videoDailyCap: VIDEO_DAILY_CAP,

@@ -61,10 +61,10 @@ export default async function EspacePage() {
               className="card-lift rounded-2xl border border-ink/10 bg-white p-6 hover:border-terracotta/40"
             >
               <h2 className="font-[family-name:var(--font-montserrat)] font-bold">
-                Abonnement
+                Acheter des crédits
               </h2>
               <p className="mt-2 text-sm text-ink/55">
-                Crédits Pro mensuels.
+                Packs Mobile Money (USSD).
               </p>
             </Link>
             <Link

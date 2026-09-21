@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { getSession } from "@/lib/auth";
 import { ensureDb } from "@/lib/db";
 import LogoutButton from "@/components/LogoutButton";
+import AdminCreditsPanel from "@/components/studio/AdminCreditsPanel";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -85,6 +86,8 @@ export default async function AdminPage() {
               </p>
             </div>
           </div>
+
+          <AdminCreditsPanel />
 
           <section className="mt-10">
             <h2 className="font-[family-name:var(--font-montserrat)] text-lg font-bold">

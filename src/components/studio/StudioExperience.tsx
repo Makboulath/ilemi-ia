@@ -11,6 +11,8 @@ type ZoneId = "image" | "video" | "son";
 
 type Wallet = {
   credits: number;
+  imageCredits?: number;
+  videoCredits?: number;
   plan: string;
   videosLeftToday: number;
   videoDailyCap: number;
@@ -103,11 +105,17 @@ export default function StudioExperience() {
       return;
     }
 
-    const needCredits = zone === "image" ? 1 : 1;
-    if (wallet && wallet.credits < needCredits) {
-      setPaywallReason("credits");
-      setPaywall(true);
-      return;
+    if (wallet) {
+      const imgLeft = wallet.imageCredits ?? wallet.credits;
+      const vidLeft = wallet.videoCredits ?? 0;
+      if (zone === "image" && imgLeft < 1) {
+        // HQ paywall optional — server still falls back to free Pollinations
+      }
+      if (zone === "video" && vidLeft < 1) {
+        setPaywallReason("credits");
+        setPaywall(true);
+        return;
+      }
     }
     if (zone === "video" && wallet && wallet.videosLeftToday <= 0) {
       setPaywallReason("daily");
@@ -195,22 +203,24 @@ export default function StudioExperience() {
             </div>
             {wallet && (
               <div className="rounded-2xl border border-cream/15 bg-navy/80 px-5 py-4 text-sm">
-                <p className="text-cream/50">Solde</p>
+                <p className="text-cream/50">Portefeuille</p>
                 <p className="mt-1 font-[family-name:var(--font-montserrat)] text-2xl font-extrabold text-gold">
-                  {wallet.credits}{" "}
+                  {wallet.imageCredits ?? wallet.credits}{" "}
                   <span className="text-base font-medium text-cream/70">
-                    crédits
+                    images HQ
                   </span>
                 </p>
-                <p className="mt-1 text-cream/45">
-                  Vidéos aujourd&apos;hui : {wallet.videosLeftToday}/
-                  {wallet.videoDailyCap} · Plan {wallet.plan}
+                <p className="mt-1 text-cream/55">
+                  {wallet.videoCredits ?? 0} crédit
+                  {(wallet.videoCredits ?? 0) === 1 ? "" : "s"} vidéo · aujourd&apos;hui{" "}
+                  {wallet.videosLeftToday}/{wallet.videoDailyCap}
                 </p>
+                <p className="mt-0.5 text-cream/40">Plan {wallet.plan}</p>
                 <Link
                   href="/abonnement"
                   className="mt-2 inline-block text-xs font-medium text-terracotta underline-offset-2 hover:underline"
                 >
-                  Passer Pro →
+                  Acheter des crédits →
                 </Link>
               </div>
             )}
@@ -220,8 +230,8 @@ export default function StudioExperience() {
         <StaggerChildren className="mt-10 flex flex-wrap gap-2">
           {(
             [
-              { id: "image" as const, label: "Image · 1 crédit" },
-              { id: "video" as const, label: "Vidéo ~10s · 1 crédit" },
+              { id: "image" as const, label: "Image HQ · 1 crédit" },
+              { id: "video" as const, label: "Vidéo ~10s · 1 crédit vidéo" },
               { id: "son" as const, label: "Son · liens" },
             ] as const
           ).map((z) => (
@@ -286,7 +296,7 @@ export default function StudioExperience() {
                   }}
                   className="btn-ghost !border-cream/25"
                 >
-                  + crédits (pub / abonnement)
+                  Acheter des crédits
                 </button>
               </div>
               {error && (
@@ -438,8 +448,8 @@ export default function StudioExperience() {
               </h2>
               <p className="mt-3 text-sm text-cream/65">
                 {paywallReason === "daily"
-                  ? "Vous avez atteint 2 vidéos aujourd’hui (heure Porto-Novo). Revenez demain, ou passez Pro pour plus de confort."
-                  : "Regardez une pub pour +1 crédit, ou abonnez-vous pour un rechargement mensuel."}
+                  ? "Vous avez atteint 2 vidéos aujourd’hui (heure Porto-Novo). Revenez demain."
+                  : "Achetez un pack Mobile Money, ou regardez une pub pour +1 crédit image."}
               </p>
 
               <div className="mt-6 space-y-3">
@@ -482,8 +492,8 @@ export default function StudioExperience() {
                   </div>
                 )}
 
-                <Link href="/abonnement" className="btn-ghost !border-cream/25 block text-center">
-                  Voir l’abonnement Pro
+                <Link href="/abonnement" className="btn-primary block text-center">
+                  Acheter des crédits (Mobile Money)
                 </Link>
                 <button
                   type="button"

@@ -57,12 +57,13 @@ export async function POST(request: Request) {
     );
   }
 
-  if (user.credits < VIDEO_CREDIT_COST) {
+  if (user.videoCredits < VIDEO_CREDIT_COST) {
     return NextResponse.json(
       {
         ok: false,
         code: "NO_CREDITS",
-        message: "Crédits insuffisants.",
+        message:
+          "Crédits vidéo insuffisants. Achetez un pack Créateur ou Studio.",
         wallet: snapshot(user),
       },
       { status: 402 }
@@ -74,7 +75,7 @@ export async function POST(request: Request) {
     user = await prisma.user.update({
       where: { id: user.id },
       data: {
-        credits: { decrement: VIDEO_CREDIT_COST },
+        videoCredits: { decrement: VIDEO_CREDIT_COST },
         videoCountToday: { increment: 1 },
       },
     });

@@ -51,6 +51,7 @@ export async function ensureDb(): Promise<PrismaClient> {
           "plan" TEXT NOT NULL DEFAULT 'FREE',
           "credits" INTEGER NOT NULL DEFAULT 7,
           "creditsBootstrapped" INTEGER NOT NULL DEFAULT 1,
+          "videoCredits" INTEGER NOT NULL DEFAULT 0,
           "videoDate" TEXT,
           "videoCountToday" INTEGER NOT NULL DEFAULT 0,
           "stripeCustomerId" TEXT,
@@ -72,6 +73,10 @@ export async function ensureDb(): Promise<PrismaClient> {
       await tryAlter(
         prisma,
         `ALTER TABLE "User" ADD COLUMN "creditsBootstrapped" INTEGER NOT NULL DEFAULT 1`
+      );
+      await tryAlter(
+        prisma,
+        `ALTER TABLE "User" ADD COLUMN "videoCredits" INTEGER NOT NULL DEFAULT 0`
       );
       await tryAlter(prisma, `ALTER TABLE "User" ADD COLUMN "videoDate" TEXT`);
       await tryAlter(
@@ -181,6 +186,36 @@ export async function ensureDb(): Promise<PrismaClient> {
       `);
       await prisma.$executeRawUnsafe(
         `CREATE INDEX IF NOT EXISTS "StudioGeneration_userId_createdAt_idx" ON "StudioGeneration"("userId", "createdAt")`
+      );
+
+      await prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "CreditOrder" (
+          "id" TEXT NOT NULL PRIMARY KEY,
+          "code" TEXT NOT NULL,
+          "userId" TEXT NOT NULL,
+          "packId" TEXT NOT NULL,
+          "amountFcfa" INTEGER NOT NULL,
+          "imageCredits" INTEGER NOT NULL,
+          "videoCredits" INTEGER NOT NULL,
+          "status" TEXT NOT NULL DEFAULT 'PENDING',
+          "smsRef" TEXT,
+          "merchantNumber" TEXT NOT NULL,
+          "reviewedBy" TEXT,
+          "reviewedAt" DATETIME,
+          "reviewNote" TEXT,
+          "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          CONSTRAINT "CreditOrder_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+        )
+      `);
+      await prisma.$executeRawUnsafe(
+        `CREATE UNIQUE INDEX IF NOT EXISTS "CreditOrder_code_key" ON "CreditOrder"("code")`
+      );
+      await prisma.$executeRawUnsafe(
+        `CREATE INDEX IF NOT EXISTS "CreditOrder_userId_createdAt_idx" ON "CreditOrder"("userId", "createdAt")`
+      );
+      await prisma.$executeRawUnsafe(
+        `CREATE INDEX IF NOT EXISTS "CreditOrder_status_createdAt_idx" ON "CreditOrder"("status", "createdAt")`
       );
     })().catch((err) => {
       globalThis.__ilemiDbReady = undefined;

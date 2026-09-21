@@ -12,24 +12,58 @@ enum Role {
   MEMBER
 }
 
-model User {
-  id                String   @id @default(cuid())
-  email             String   @unique
-  passwordHash      String
-  role              Role     @default(MEMBER)
-  displayName       String?
-  plan              String   @default("FREE")
-  credits           Int      @default(7)
-  creditsBootstrapped Boolean @default(true)
-  videoDate         String?
-  videoCountToday   Int      @default(0)
-  stripeCustomerId  String?
-  createdAt         DateTime @default(now())
+enum CreditOrderStatus {
+  PENDING
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
 
-  courseProgress    CourseProgress[]
-  quizAttempts      QuizAttempt[]
-  certificates      Certificate[]
-  generations       StudioGeneration[]
+model User {
+  id                  String   @id @default(cuid())
+  email               String   @unique
+  passwordHash        String
+  role                Role     @default(MEMBER)
+  displayName         String?
+  plan                String   @default("FREE")
+  /// HQ image credits (existing wallet field — packs grant here)
+  credits             Int      @default(7)
+  creditsBootstrapped Boolean  @default(true)
+  /// Purchased video entitlements (packs grant here)
+  videoCredits        Int      @default(0)
+  videoDate           String?
+  videoCountToday     Int      @default(0)
+  stripeCustomerId    String?
+  createdAt           DateTime @default(now())
+
+  courseProgress CourseProgress[]
+  quizAttempts   QuizAttempt[]
+  certificates   Certificate[]
+  generations    StudioGeneration[]
+  creditOrders   CreditOrder[]
+}
+
+model CreditOrder {
+  id              String            @id @default(cuid())
+  code            String            @unique
+  userId          String
+  packId          String
+  amountFcfa      Int
+  imageCredits    Int
+  videoCredits    Int
+  status          CreditOrderStatus @default(PENDING)
+  smsRef          String?
+  merchantNumber  String
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  reviewNote      String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
 }
 
 model PageView {
