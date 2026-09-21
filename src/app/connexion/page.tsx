@@ -18,7 +18,12 @@ export default async function ConnexionPage({
   const sp = await searchParams;
   const next = typeof sp.next === "string" ? sp.next : "/espace";
   const gated =
-    next.startsWith("/apprendre") || next.startsWith("/studio");
+    next.startsWith("/apprendre") ||
+    next.startsWith("/studio") ||
+    next.startsWith("/abonnement");
+  const gatedCopy = next.startsWith("/abonnement")
+    ? "L’achat de crédits Studio nécessite un compte. Connectez-vous ou créez un compte — vous reviendrez ensuite au paiement Mobile Money."
+    : "Apprendre et le Studio sont réservés aux membres. Connectez-vous ou créez un compte pour continuer.";
 
   return (
     <>
@@ -31,7 +36,7 @@ export default async function ConnexionPage({
           </h1>
           <p className="mt-3 text-ink/60">
             {gated
-              ? "Apprendre et le Studio sont réservés aux membres. Connectez-vous ou créez un compte pour continuer."
+              ? gatedCopy
               : "Accédez à votre espace membre ou à l'administration."}
           </p>
           {gated && (
@@ -42,8 +47,10 @@ export default async function ConnexionPage({
                 className="font-medium text-terracotta underline-offset-2 hover:underline"
               >
                 Créer un compte
-              </Link>{" "}
-             , c&apos;est gratuit pour accéder au hub et au Studio.
+              </Link>
+              {next.startsWith("/abonnement")
+                ? " — gratuit, puis retour au paiement."
+                : " , c'est gratuit pour accéder au hub et au Studio."}
             </p>
           )}
           <div className="mt-8">

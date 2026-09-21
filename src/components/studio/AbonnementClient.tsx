@@ -1,15 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { LINKS } from "@/lib/constants";
 import FadeIn from "@/components/motion/FadeIn";
 import {
   CREDIT_PACKS,
+  getPack,
   type CreditPack,
   type CreditPackId,
 } from "@/lib/studio/packs";
+
+/** Login/signup return URL that can resume a pack purchase. */
+function authReturnUrl(packId?: string) {
+  const next = packId ? `/abonnement?pack=${packId}` : "/abonnement";
+  return `/connexion?next=${encodeURIComponent(next)}`;
+}
 
 type Order = {
   id: string;
@@ -46,6 +53,8 @@ async function copyText(text: string) {
 
 export default function AbonnementClient() {
   const params = useSearchParams();
+  const router = useRouter();
+  const resumeLock = useRef(false);
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -55,12 +64,54 @@ export default function AbonnementClient() {
   const [copied, setCopied] = useState("");
   const [stripeMsg, setStripeMsg] = useState("");
 
-  const refreshOrders = useCallback(async () => {
+  const applyOpenOrder = useCallback((open: Order) => {
+    setActiveOrder(open);
+    setPayment({
+      merchantNumber: open.merchantNumber,
+      amountFcfa: open.amountFcfa,
+      code: open.code,
+      moovUssd: `*880*1*1*${open.merchantNumber}*${open.merchantNumber}*${open.amountFcfa}#`,
+    });
+  }, []);
+
+  const createOrder = useCallback(async (pack: CreditPack) => {
+    setBusy(true);
+    setMessage("");
+    try {
+      const res = await fetch("/api/credits/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ packId: pack.id as CreditPackId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401 || data?.message === "Non authentifié.") {
+        setLoggedIn(false);
+        window.location.href = authReturnUrl(pack.id);
+        return false;
+      }
+      if (!data.ok) {
+        setMessage(data.message || "Impossible de créer la commande.");
+        return false;
+      }
+      setActiveOrder(data.order);
+      setPayment(data.payment);
+      setSmsRef("");
+      return true;
+    } catch {
+      setMessage("Erreur réseau.");
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  /** false = logged out; Order = open order applied; null = logged in, no open order */
+  const refreshOrders = useCallback(async (): Promise<false | Order | null> => {
     try {
       const me = await fetch("/api/auth/me").then((r) => r.json());
       if (!me?.ok) {
         setLoggedIn(false);
-        return;
+        return false;
       }
       setLoggedIn(true);
       const res = await fetch("/api/credits/order").then((r) => r.json());
@@ -69,19 +120,16 @@ export default function AbonnementClient() {
           (o: Order) => o.status === "PENDING" || o.status === "SUBMITTED",
         );
         if (open) {
-          setActiveOrder(open);
-          setPayment({
-            merchantNumber: open.merchantNumber,
-            amountFcfa: open.amountFcfa,
-            code: open.code,
-            moovUssd: `*880*1*1*${open.merchantNumber}*${open.merchantNumber}*${open.amountFcfa}#`,
-          });
+          applyOpenOrder(open);
+          return open;
         }
       }
+      return null;
     } catch {
       setLoggedIn(false);
+      return false;
     }
-  }, []);
+  }, [applyOpenOrder]);
 
   useEffect(() => {
     if (params.get("success") === "1") {
@@ -91,8 +139,57 @@ export default function AbonnementClient() {
     } else if (params.get("cancel") === "1") {
       setStripeMsg("Paiement Stripe annulé.");
     }
-    refreshOrders();
-  }, [params, refreshOrders]);
+
+    let cancelled = false;
+    void (async () => {
+      const result = await refreshOrders();
+      if (cancelled || result === false) return;
+
+      const packId = params.get("pack");
+      if (!packId) return;
+
+      // Already have a pending/submitted order → show it, drop ?pack=
+      if (result) {
+        router.replace("/abonnement", { scroll: false });
+        return;
+      }
+
+      // Resume pack purchase after login/signup (?pack=essai|createur|studio)
+      const pack = getPack(packId);
+      if (!pack) return;
+
+      const lockKey = `ilemi-abo-resume:${packId}`;
+      try {
+        if (sessionStorage.getItem(lockKey) === "done") {
+          router.replace("/abonnement", { scroll: false });
+          return;
+        }
+      } catch {
+        /* private mode */
+      }
+      if (resumeLock.current) return;
+      resumeLock.current = true;
+      router.replace("/abonnement", { scroll: false });
+      if (cancelled) {
+        resumeLock.current = false;
+        return;
+      }
+      const created = await createOrder(pack);
+      if (created) {
+        try {
+          sessionStorage.setItem(lockKey, "done");
+        } catch {
+          /* ignore */
+        }
+      } else {
+        resumeLock.current = false;
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [params, refreshOrders, router, createOrder]);
 
   async function handleCopy(label: string, value: string) {
     const ok = await copyText(value);
@@ -101,31 +198,11 @@ export default function AbonnementClient() {
   }
 
   async function buyPack(pack: CreditPack) {
-    if (!loggedIn) {
-      window.location.href = `/connexion?next=/abonnement`;
+    if (loggedIn !== true) {
+      window.location.href = authReturnUrl(pack.id);
       return;
     }
-    setBusy(true);
-    setMessage("");
-    try {
-      const res = await fetch("/api/credits/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ packId: pack.id as CreditPackId }),
-      });
-      const data = await res.json();
-      if (!data.ok) {
-        setMessage(data.message || "Impossible de créer la commande.");
-        return;
-      }
-      setActiveOrder(data.order);
-      setPayment(data.payment);
-      setSmsRef("");
-    } catch {
-      setMessage("Erreur réseau.");
-    } finally {
-      setBusy(false);
-    }
+    await createOrder(pack);
   }
 
   async function confirmPaid() {
@@ -159,6 +236,10 @@ export default function AbonnementClient() {
   }
 
   async function stripeCheckout() {
+    if (loggedIn !== true) {
+      window.location.href = authReturnUrl();
+      return;
+    }
     setBusy(true);
     setStripeMsg("");
     try {
@@ -205,12 +286,19 @@ export default function AbonnementClient() {
         {loggedIn === false && (
           <p className="mt-4 rounded-xl border border-terracotta/25 bg-terracotta/5 px-4 py-3 text-sm text-ink/70">
             <Link
-              href="/connexion?next=/abonnement"
+              href={authReturnUrl()}
               className="font-semibold text-terracotta underline-offset-2 hover:underline"
             >
               Connectez-vous
             </Link>{" "}
-            pour créer une commande et recevoir votre code ILM-XXXX.
+            ou{" "}
+            <Link
+              href={`/inscription?next=${encodeURIComponent("/abonnement")}`}
+              className="font-semibold text-terracotta underline-offset-2 hover:underline"
+            >
+              créez un compte
+            </Link>{" "}
+            pour acheter un pack et recevoir votre code ILM-XXXX.
           </p>
         )}
       </FadeIn>
@@ -245,14 +333,31 @@ export default function AbonnementClient() {
                     : "Pas de vidéo"}
                 </li>
               </ul>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => buyPack(pack)}
-                className="btn-primary mt-6 w-full disabled:opacity-50"
-              >
-                {busy ? "…" : "Acheter des crédits"}
-              </button>
+              {loggedIn === null ? (
+                <button
+                  type="button"
+                  disabled
+                  className="btn-primary mt-6 w-full disabled:opacity-50"
+                >
+                  …
+                </button>
+              ) : loggedIn === false ? (
+                <Link
+                  href={authReturnUrl(pack.id)}
+                  className="btn-primary mt-6 w-full text-center"
+                >
+                  Se connecter pour acheter
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => buyPack(pack)}
+                  className="btn-primary mt-6 w-full disabled:opacity-50"
+                >
+                  {busy ? "…" : "Acheter des crédits"}
+                </button>
+              )}
             </article>
           ))}
         </div>
