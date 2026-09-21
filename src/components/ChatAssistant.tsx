@@ -95,7 +95,7 @@ export default function ChatAssistant() {
                 Assistant Ilémi.IA
               </p>
               <p className="truncate text-xs text-white/70">
-                Propulsé par Llama 3.3
+                Propulsé par Groq
               </p>
             </div>
           </header>

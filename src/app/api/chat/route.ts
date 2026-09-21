@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import {
-  CHAT_MODEL,
+  CHAT_MODEL_FALLBACKS,
   CHAT_SYSTEM_PROMPT,
   offlineReply,
 } from "@/lib/chat/system";
@@ -49,47 +49,52 @@ export async function POST(request: Request) {
   let fallbackReason = key ? "GROQ_UNREACHABLE" : "NO_GROQ_KEY";
 
   if (key) {
-    try {
-      const res = await fetch(
-        "https://api.groq.com/openai/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${key}`,
-          },
-          body: JSON.stringify({
-            model: CHAT_MODEL,
-            messages: [
-              { role: "system", content: CHAT_SYSTEM_PROMPT },
-              ...messages.map((m) => ({
-                role: m.role,
-                content: m.content,
-              })),
-            ],
-            max_tokens: 300,
-            temperature: 0.7,
-          }),
+    const payloadMessages = [
+      { role: "system" as const, content: CHAT_SYSTEM_PROMPT },
+      ...messages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      })),
+    ];
+
+    for (const model of CHAT_MODEL_FALLBACKS) {
+      try {
+        const res = await fetch(
+          "https://api.groq.com/openai/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${key}`,
+            },
+            body: JSON.stringify({
+              model,
+              messages: payloadMessages,
+              max_tokens: 300,
+              temperature: 0.7,
+            }),
+          }
+        );
+        if (res.ok) {
+          const data = (await res.json()) as {
+            choices?: { message?: { content?: string } }[];
+          };
+          const reply = data.choices?.[0]?.message?.content?.trim();
+          if (reply) {
+            return NextResponse.json({
+              ok: true,
+              reply,
+              provider: `groq:${model}`,
+            });
+          }
+          fallbackReason = `GROQ_EMPTY:${model}`;
+          continue;
         }
-      );
-      if (res.ok) {
-        const data = (await res.json()) as {
-          choices?: { message?: { content?: string } }[];
-        };
-        const reply = data.choices?.[0]?.message?.content?.trim();
-        if (reply) {
-          return NextResponse.json({
-            ok: true,
-            reply,
-            provider: "groq",
-          });
-        }
-        fallbackReason = "GROQ_EMPTY";
-      } else {
-        fallbackReason = `GROQ_HTTP_${res.status}`;
+        fallbackReason = `GROQ_HTTP_${res.status}:${model}`;
+        if (res.status === 401 || res.status === 403) break;
+      } catch {
+        fallbackReason = `GROQ_NETWORK:${model}`;
       }
-    } catch {
-      fallbackReason = "GROQ_NETWORK";
     }
   }
 

@@ -1,6 +1,13 @@
 import { LINKS } from "@/lib/constants";
 
-export const CHAT_MODEL = "llama-3.3-70b-versatile";
+// llama-3.3-70b-versatile retired by Groq (2026-08-16) for free/dev tiers.
+// Recommended replacement: openai/gpt-oss-120b
+export const CHAT_MODEL = "openai/gpt-oss-120b";
+export const CHAT_MODEL_FALLBACKS = [
+  "openai/gpt-oss-120b",
+  "openai/gpt-oss-20b",
+  "qwen/qwen3.6-27b",
+] as const;
 
 export const CHAT_SYSTEM_PROMPT = `Tu es l'assistant chaleureux d'Ilémi.IA, une maison IA francophone accessible. Ton objectif : évaluer en 3-4 échanges courts le besoin et le niveau de l'utilisateur, puis lui recommander l'offre la plus adaptée.
 
