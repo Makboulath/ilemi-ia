@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureDb } from "@/lib/db";
+import { notifyAdminCreditOrder } from "@/lib/mail/credits-notify";
 import { requireDbUser } from "@/lib/session-user";
 import {
   getPack,
@@ -92,6 +93,16 @@ export async function POST(request: Request) {
       }),
     },
   });
+
+  // Admin alert — never block the user response
+  void notifyAdminCreditOrder({
+    event: "created",
+    code: order.code,
+    packName: pack.name,
+    amountFcfa: order.amountFcfa,
+    status: order.status,
+    userEmail: auth.user.email,
+  }).catch((err) => console.error("[credits-notify] unexpected", err));
 
   return NextResponse.json({
     ok: true,

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { ensureDb } from "@/lib/db";
+import { notifyAdminCreditOrder } from "@/lib/mail/credits-notify";
 import { requireDbUser } from "@/lib/session-user";
+import { getPack } from "@/lib/studio/packs";
 
 export const dynamic = "force-dynamic";
 
@@ -71,6 +73,18 @@ export async function POST(request: Request) {
       }),
     },
   });
+
+  const pack = getPack(order.packId);
+  // Prefer this alert — user marked « J’ai payé » (actionable for admin)
+  void notifyAdminCreditOrder({
+    event: "paid_pending",
+    code: updated.code,
+    packName: pack?.name ?? order.packId,
+    amountFcfa: updated.amountFcfa,
+    status: updated.status,
+    userEmail: auth.user.email,
+    smsRef: updated.smsRef,
+  }).catch((err) => console.error("[credits-notify] unexpected", err));
 
   return NextResponse.json({
     ok: true,
