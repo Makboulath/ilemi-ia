@@ -49,6 +49,7 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={pending}
+          aria-busy={pending}
           className="btn-primary w-full sm:w-auto disabled:opacity-60"
         >
           {pending ? "Envoi…" : "Envoyer le message"}

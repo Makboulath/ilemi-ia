@@ -120,7 +120,11 @@ export default function AdminCreditsPanel() {
       )}
 
       {loading ? (
-        <p className="mt-4 text-sm text-ink/45">Chargement…</p>
+        <div className="mt-4 space-y-3" aria-busy="true" aria-live="polite">
+          <p className="sr-only">Chargement des commandes…</p>
+          <div className="skeleton h-28" />
+          <div className="skeleton h-28" />
+        </div>
       ) : orders.length === 0 ? (
         <p className="mt-4 text-sm text-ink/50">
           Aucune commande en attente.
@@ -156,10 +160,11 @@ export default function AdminCreditsPanel() {
                   <button
                     type="button"
                     disabled={busyId === o.id}
+                    aria-busy={busyId === o.id}
                     onClick={() => act(o.id, "approve")}
                     className="btn-primary !py-2 !px-4 text-sm disabled:opacity-50"
                   >
-                    Approuver
+                    {busyId === o.id ? "…" : "Approuver"}
                   </button>
                   <button
                     type="button"

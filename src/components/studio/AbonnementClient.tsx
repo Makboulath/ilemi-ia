@@ -303,7 +303,7 @@ export default function AbonnementClient() {
     CREDIT_PACKS.find((p) => p.id === id)?.name || id;
 
   return (
-    <div className="mx-auto max-w-[960px] px-5 py-16 md:px-8 md:py-24">
+    <div className="mx-auto max-w-[960px] page-pad py-14 sm:py-16 md:py-24">
       <FadeIn>
         <p className="section-label">Studio</p>
         <h1 className="font-[family-name:var(--font-montserrat)] text-3xl font-extrabold tracking-tight md:text-4xl">
@@ -335,13 +335,13 @@ export default function AbonnementClient() {
       </FadeIn>
 
       <FadeIn delay={0.06} className="mt-10">
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
           {CREDIT_PACKS.map((pack) => (
             <article
               key={pack.id}
-              className={`flex flex-col rounded-2xl border bg-white p-6 ${
+              className={`flex flex-col rounded-2xl border bg-white p-5 sm:p-6 transition hover:border-ink/20 ${
                 pack.highlight
-                  ? "border-terracotta/50 border-t-[3px] shadow-sm"
+                  ? "border-terracotta/50 border-t-[3px] shadow-sm sm:col-span-2 md:col-span-1"
                   : "border-ink/10"
               }`}
             >
@@ -368,9 +368,10 @@ export default function AbonnementClient() {
                 <button
                   type="button"
                   disabled
+                  aria-busy="true"
                   className="btn-primary mt-6 w-full disabled:opacity-50"
                 >
-                  …
+                  Vérification…
                 </button>
               ) : loggedIn === false ? (
                 <a
@@ -383,10 +384,11 @@ export default function AbonnementClient() {
                 <button
                   type="button"
                   disabled={busy}
+                  aria-busy={busy}
                   onClick={() => buyPack(pack)}
                   className="btn-primary mt-6 w-full disabled:opacity-50"
                 >
-                  {busy ? "…" : "Acheter des crédits"}
+                  {busy ? "Création de la commande…" : "Acheter des crédits"}
                 </button>
               )}
             </article>
@@ -517,7 +519,7 @@ export default function AbonnementClient() {
                     value={smsRef}
                     onChange={(e) => setSmsRef(e.target.value)}
                     placeholder="Ex. ID transaction reçu par SMS"
-                    className="mt-1.5 w-full rounded-xl border border-ink/15 bg-white px-4 py-2.5 text-sm outline-none focus:border-terracotta"
+                    className="field-light mt-1.5 !rounded-xl !py-2.5 text-sm"
                   />
                 </label>
                 <button
@@ -546,7 +548,10 @@ export default function AbonnementClient() {
       )}
 
       {message && (
-        <p className="mt-6 text-sm text-ink/70" role="status">
+        <p
+          className="mt-6 rounded-xl border border-ink/10 bg-white px-4 py-3 text-sm text-ink/75"
+          role="status"
+        >
           {message}
         </p>
       )}

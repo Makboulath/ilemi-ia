@@ -75,7 +75,7 @@ export default function AuthForm({
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded border border-ink/15 bg-white px-3.5 py-3 outline-none focus:border-terracotta"
+          className="field-light !rounded-lg"
         />
       </div>
       <div>
@@ -100,7 +100,7 @@ export default function AuthForm({
           minLength={mode === "register" ? 8 : undefined}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded border border-ink/15 bg-white px-3.5 py-3 outline-none focus:border-terracotta"
+          className="field-light !rounded-lg"
         />
         {mode === "register" && (
           <p className="mt-1 text-xs text-ink/45">8 caractères minimum.</p>

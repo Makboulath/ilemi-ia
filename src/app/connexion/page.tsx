@@ -29,8 +29,8 @@ export default async function ConnexionPage({
   return (
     <>
       <Header />
-      <main className="bg-cream text-ink">
-        <div className="mx-auto max-w-md px-5 py-16 md:px-8 md:py-24">
+      <main id="contenu-principal" className="bg-cream text-ink">
+        <div className="mx-auto max-w-md page-pad py-14 sm:py-16 md:py-24">
           <p className="section-label">Compte</p>
           <h1 className="font-[family-name:var(--font-montserrat)] text-3xl font-extrabold tracking-tight">
             Connexion

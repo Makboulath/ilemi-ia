@@ -6,6 +6,7 @@ const FOOTER_NAV = [
   { href: "/#offre", label: "Offres" },
   { href: "/studio", label: "Studio" },
   { href: "/apprendre", label: "Apprendre" },
+  { href: "/abonnement", label: "Crédits" },
   { href: "/#apropos", label: "À propos" },
   { href: "/connexion", label: "Connexion" },
 ];
@@ -13,11 +14,11 @@ const FOOTER_NAV = [
 export default function Footer() {
   return (
     <footer className="border-t border-cream/10 bg-ink py-10 md:py-12">
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 sm:px-5 md:flex-row md:items-center md:justify-between md:px-8">
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-6 page-pad md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
           <Image
             src="/logo-mark-sm.png"
-            alt=""
+            alt="ilémi.IA"
             width={32}
             height={32}
             className="h-8 w-8 object-contain"
@@ -68,7 +69,7 @@ export default function Footer() {
           </Link>
         </nav>
       </div>
-      <p className="mx-auto mt-8 max-w-[1200px] px-5 text-xs text-cream/28 md:px-8">
+      <p className="mx-auto mt-8 max-w-[1200px] page-pad text-xs text-cream/28">
         © 2026 Ilémi.IA. Tous droits réservés.
       </p>
     </footer>

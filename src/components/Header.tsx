@@ -63,8 +63,12 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-cream/95 text-ink shadow-sm backdrop-blur-md">
-      <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-5 py-3 md:px-8">
-        <Link href="/" className="flex shrink-0 items-center gap-2.5">
+      <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 page-pad py-3 sm:gap-4">
+        <Link
+          href="/"
+          className="flex shrink-0 items-center gap-2.5"
+          aria-label="ilémi.IA — accueil"
+        >
           <Image
             src="/logo-mark-sm.png"
             alt=""

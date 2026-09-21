@@ -66,7 +66,7 @@ export default function ResetPasswordForm() {
           minLength={8}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded border border-ink/15 bg-white px-3.5 py-3 outline-none focus:border-terracotta"
+          className="field-light !rounded-lg"
         />
       </div>
       <div>
@@ -81,7 +81,7 @@ export default function ResetPasswordForm() {
           minLength={8}
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
-          className="w-full rounded border border-ink/15 bg-white px-3.5 py-3 outline-none focus:border-terracotta"
+          className="field-light !rounded-lg"
         />
       </div>
       {error && (
@@ -89,8 +89,8 @@ export default function ResetPasswordForm() {
           {error}
         </p>
       )}
-      <button type="submit" disabled={pending} className="btn-primary w-full">
-        {pending ? "…" : "Enregistrer et me connecter"}
+      <button type="submit" disabled={pending} aria-busy={pending} className="btn-primary w-full">
+        {pending ? "Enregistrement…" : "Enregistrer et me connecter"}
       </button>
     </form>
   );

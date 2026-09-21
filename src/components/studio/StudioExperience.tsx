@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { LINKS } from "@/lib/constants";
 import FadeIn from "@/components/motion/FadeIn";
 import { StaggerChildren, StaggerItem } from "@/components/motion/StaggerChildren";
 
@@ -95,6 +94,20 @@ export default function StudioExperience() {
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    if (!paywall) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPaywall(false);
+    };
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [paywall]);
 
   async function generate() {
     setError("");
@@ -188,7 +201,7 @@ export default function StudioExperience() {
         className="pointer-events-none absolute -right-20 top-40 h-80 w-80 rounded-full bg-gold/15 blur-3xl"
       />
 
-      <section className="relative mx-auto max-w-[1200px] px-5 py-16 md:px-8 md:py-24">
+      <section className="relative mx-auto max-w-[1200px] page-pad py-14 sm:py-16 md:py-24">
         <FadeIn>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
@@ -224,6 +237,21 @@ export default function StudioExperience() {
                 </Link>
               </div>
             )}
+            {!wallet && (
+              <div className="w-full rounded-2xl border border-cream/15 bg-navy/80 px-5 py-4 text-sm sm:w-auto">
+                <p className="text-cream/50">Mode démo</p>
+                <p className="mt-1 text-cream/70">
+                  Images gratuites sans compte.{" "}
+                  <Link
+                    href="/connexion?next=/studio"
+                    className="font-medium text-gold underline-offset-2 hover:underline"
+                  >
+                    Connexion
+                  </Link>{" "}
+                  pour l&apos;historique et les crédits vidéo.
+                </p>
+              </div>
+            )}
           </div>
         </FadeIn>
 
@@ -238,12 +266,13 @@ export default function StudioExperience() {
             <StaggerItem key={z.id}>
               <button
                 type="button"
+                aria-pressed={zone === z.id}
                 onClick={() => {
                   setZone(z.id);
                   setError("");
                   setResultUrl(null);
                 }}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                className={`min-h-11 rounded-full border px-4 py-2 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${
                   zone === z.id
                     ? "border-terracotta bg-terracotta text-cream"
                     : "border-cream/20 text-cream/70 hover:border-cream/40"
@@ -268,22 +297,30 @@ export default function StudioExperience() {
                     ? "Provider vidéo fal.ai configuré."
                     : "Vidéo : connectez-vous et configurez FAL_KEY (pas encore en démo gratuite)."}
               </p>
+              <label htmlFor="studio-prompt" className="sr-only">
+                Description de la création
+              </label>
               <textarea
+                id="studio-prompt"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 rows={3}
+                disabled={busy}
+                aria-invalid={!!error}
+                aria-describedby={error ? "studio-error" : undefined}
                 placeholder={
                   zone === "image"
                     ? "Ex. Une maison chaleureuse au crépuscule, style éditorial ouest-africain…"
                     : "Ex. Travelling doux sur un atelier créatif, lumière dorée, ~10 secondes…"
                 }
-                className="mt-4 w-full rounded-xl border border-cream/15 bg-ink/60 px-4 py-3 text-sm text-cream outline-none placeholder:text-cream/30 focus:border-terracotta"
+                className="field-dark mt-4"
               />
               <div className="mt-4 flex flex-wrap gap-3">
                 <button
                   type="button"
                   onClick={generate}
                   disabled={busy}
+                  aria-busy={busy}
                   className="btn-primary disabled:opacity-50"
                 >
                   {busy ? "Génération…" : "Générer"}
@@ -300,7 +337,7 @@ export default function StudioExperience() {
                 </button>
               </div>
               {error && (
-                <p className="mt-3 text-sm text-terracotta" role="alert">
+                <p id="studio-error" className="mt-3 text-sm text-terracotta" role="alert">
                   {error}
                 </p>
               )}
@@ -313,9 +350,13 @@ export default function StudioExperience() {
                   pour garder l&apos;historique et les crédits.
                 </p>
               )}
-              <div className="relative mt-6 min-h-[200px] overflow-hidden rounded-xl border border-cream/10 bg-gradient-to-br from-navy to-ink">
+              <div
+                className="relative mt-6 min-h-[200px] overflow-hidden rounded-xl border border-cream/10 bg-gradient-to-br from-navy to-ink"
+                aria-live="polite"
+                aria-busy={busy}
+              >
                 {busy ? (
-                  <div className="flex min-h-[200px] items-center justify-center">
+                  <div className="flex min-h-[200px] flex-col items-center justify-center gap-3">
                     <motion.div
                       className="h-14 w-14 rounded-full border-2 border-terracotta/40 border-t-terracotta"
                       animate={reduce ? undefined : { rotate: 360 }}
@@ -324,23 +365,29 @@ export default function StudioExperience() {
                           ? undefined
                           : { repeat: Infinity, duration: 0.9, ease: "linear" }
                       }
+                      aria-hidden
                     />
+                    <p className="text-sm text-cream/50">Génération en cours…</p>
                   </div>
                 ) : resultUrl && resultKind === "image" ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={resultUrl}
-                    alt="Résultat"
+                    alt={prompt.trim() ? `Image générée : ${prompt.trim().slice(0, 120)}` : "Image générée"}
+                    loading="eager"
+                    decoding="async"
                     className="max-h-[420px] w-full object-contain"
                   />
                 ) : resultUrl && resultKind === "video" ? (
                   <video
                     src={resultUrl}
                     controls
+                    playsInline
                     className="max-h-[420px] w-full"
+                    aria-label="Vidéo générée"
                   />
                 ) : (
-                  <p className="flex min-h-[200px] items-center justify-center text-sm text-cream/35">
+                  <p className="flex min-h-[200px] items-center justify-center px-4 text-center text-sm text-cream/35">
                     Le résultat apparaîtra ici
                   </p>
                 )}
@@ -395,7 +442,9 @@ export default function StudioExperience() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={item.url}
-                      alt=""
+                      alt={item.prompt ? item.prompt.slice(0, 80) : "Création précédente"}
+                      loading="lazy"
+                      decoding="async"
                       className="mt-2 h-28 w-full rounded-lg object-cover"
                     />
                   )}
@@ -425,6 +474,7 @@ export default function StudioExperience() {
             exit={{ opacity: 0 }}
             role="dialog"
             aria-modal="true"
+            aria-labelledby="studio-paywall-title"
           >
             <button
               type="button"
@@ -436,14 +486,17 @@ export default function StudioExperience() {
               initial={reduce ? false : { y: 40, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={reduce ? undefined : { y: 24, opacity: 0 }}
-              className="relative z-10 w-full max-w-lg rounded-2xl border border-cream/15 bg-navy p-7 text-cream shadow-2xl"
+              className="relative z-10 max-h-[min(90vh,720px)] w-full max-w-lg overflow-y-auto rounded-2xl border border-cream/15 bg-navy p-6 text-cream shadow-2xl sm:p-7"
             >
               <p className="text-[0.7rem] font-medium uppercase tracking-[0.1em] text-gold">
                 {paywallReason === "daily"
                   ? "Limite vidéo du jour"
                   : "Plus de crédits"}
               </p>
-              <h2 className="mt-2 font-[family-name:var(--font-montserrat)] text-2xl font-extrabold">
+              <h2
+                id="studio-paywall-title"
+                className="mt-2 font-[family-name:var(--font-montserrat)] text-2xl font-extrabold"
+              >
                 Continuer à créer
               </h2>
               <p className="mt-3 text-sm text-cream/65">

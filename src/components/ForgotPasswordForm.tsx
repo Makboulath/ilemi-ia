@@ -48,7 +48,7 @@ export default function ForgotPasswordForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded border border-ink/15 bg-white px-3.5 py-3 outline-none focus:border-terracotta"
+          className="field-light !rounded-lg"
         />
       </div>
       {error && (
@@ -61,8 +61,8 @@ export default function ForgotPasswordForm() {
           {done}
         </p>
       )}
-      <button type="submit" disabled={pending || !!done} className="btn-primary w-full disabled:opacity-50">
-        {pending ? "…" : "Envoyer le lien"}
+      <button type="submit" disabled={pending || !!done} aria-busy={pending} className="btn-primary w-full disabled:opacity-50">
+        {pending ? "Envoi…" : "Envoyer le lien"}
       </button>
     </form>
   );

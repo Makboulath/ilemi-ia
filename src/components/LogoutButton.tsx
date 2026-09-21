@@ -23,9 +23,10 @@ export default function LogoutButton() {
       type="button"
       onClick={logout}
       disabled={pending}
-      className="rounded border border-ink/15 px-4 py-2.5 text-sm font-medium text-ink/70 hover:bg-ink/5 disabled:opacity-60"
+      aria-busy={pending}
+      className="min-h-11 rounded border border-ink/15 px-4 py-2.5 text-sm font-medium text-ink/70 transition hover:bg-ink/5 disabled:opacity-60"
     >
-      {pending ? "…" : "Se déconnecter"}
+      {pending ? "Déconnexion…" : "Se déconnecter"}
     </button>
   );
 }

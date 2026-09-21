@@ -46,8 +46,8 @@ export default async function AdminPage() {
   return (
     <>
       <Header />
-      <main className="bg-cream text-ink">
-        <div className="mx-auto max-w-[1000px] px-5 py-16 md:px-8 md:py-24">
+      <main id="contenu-principal" className="bg-cream text-ink">
+        <div className="mx-auto max-w-[1000px] page-pad py-14 sm:py-16 md:py-24">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="section-label">Administration</p>

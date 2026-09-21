@@ -22,8 +22,8 @@ export default async function EspacePage() {
   return (
     <>
       <Header />
-      <main className="bg-cream text-ink">
-        <div className="mx-auto max-w-[900px] px-5 py-16 md:px-8 md:py-24">
+      <main id="contenu-principal" className="bg-cream text-ink">
+        <div className="mx-auto max-w-[900px] page-pad py-14 sm:py-16 md:py-24">
           <p className="section-label">Espace membre</p>
           <h1 className="font-[family-name:var(--font-montserrat)] text-3xl font-extrabold tracking-tight md:text-4xl">
             Bienvenue
@@ -37,7 +37,7 @@ export default async function EspacePage() {
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Link
               href="/apprendre"
-              className="card-lift rounded-2xl border border-ink/10 bg-white p-6 hover:border-terracotta/40"
+              className="card-lift flex min-h-[7.5rem] flex-col rounded-2xl border border-ink/10 bg-white p-5 transition hover:border-terracotta/40 sm:p-6"
             >
               <h2 className="font-[family-name:var(--font-montserrat)] font-bold">
                 Apprendre
@@ -48,7 +48,7 @@ export default async function EspacePage() {
             </Link>
             <Link
               href="/studio"
-              className="card-lift rounded-2xl border border-ink/10 bg-white p-6 hover:border-terracotta/40"
+              className="card-lift flex min-h-[7.5rem] flex-col rounded-2xl border border-ink/10 bg-white p-5 transition hover:border-terracotta/40 sm:p-6"
             >
               <h2 className="font-[family-name:var(--font-montserrat)] font-bold">
                 Studio
@@ -59,7 +59,7 @@ export default async function EspacePage() {
             </Link>
             <Link
               href="/abonnement"
-              className="card-lift rounded-2xl border border-ink/10 bg-white p-6 hover:border-terracotta/40"
+              className="card-lift flex min-h-[7.5rem] flex-col rounded-2xl border border-ink/10 bg-white p-5 transition hover:border-terracotta/40 sm:p-6"
             >
               <h2 className="font-[family-name:var(--font-montserrat)] font-bold">
                 Acheter des crédits
@@ -70,7 +70,7 @@ export default async function EspacePage() {
             </Link>
             <Link
               href="/#contact"
-              className="card-lift rounded-2xl border border-ink/10 bg-white p-6 hover:border-terracotta/40"
+              className="card-lift flex min-h-[7.5rem] flex-col rounded-2xl border border-ink/10 bg-white p-5 transition hover:border-terracotta/40 sm:p-6"
             >
               <h2 className="font-[family-name:var(--font-montserrat)] font-bold">
                 Contact

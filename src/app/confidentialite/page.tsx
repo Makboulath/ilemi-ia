@@ -13,8 +13,8 @@ export default function ConfidentialitePage() {
   return (
     <>
       <Header />
-      <main className="bg-cream text-ink">
-        <article className="mx-auto max-w-3xl px-5 py-16 md:px-8 md:py-24">
+      <main id="contenu-principal" className="bg-cream text-ink">
+        <article className="mx-auto max-w-3xl page-pad py-14 sm:py-16 md:py-24">
           <p className="section-label">Vie privée</p>
           <h1 className="font-[family-name:var(--font-montserrat)] text-3xl font-extrabold tracking-tight md:text-4xl">
             Politique de confidentialité

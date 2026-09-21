@@ -7,11 +7,14 @@ export const metadata: Metadata = {
   title: "Studio créatif",
   description:
     "Studio créatif ilémi.IA — générez des images IA (démo Pollinations), explorez la vidéo et les outils audio.",
+  alternates: { canonical: "/studio" },
   openGraph: {
     title: "Studio créatif | ilémi.IA",
     description:
       "Générez des images IA, explorez la vidéo courte et les outils audio.",
+    url: "/studio",
   },
+  robots: { index: true, follow: true },
 };
 
 export default function StudioPage() {

@@ -29,6 +29,7 @@ export default function ApprendreHub() {
   const [loading, setLoading] = useState(true);
   const [pathId, setPathId] = useState<LearningPath["id"]>("debutant");
   const [openLesson, setOpenLesson] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState("");
   const reduce = useReducedMotion();
 
   const load = useCallback(async () => {
@@ -82,31 +83,50 @@ export default function ApprendreHub() {
 
   async function toggleDone(lessonId: string) {
     const currently = pathDoneIds.includes(lessonId);
-    const res = await fetch("/api/apprendre/progress", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        pathId,
-        lessonId,
-        completed: !currently,
-      }),
-    });
-    const data = await res.json();
-    if (data.ok) {
-      setProgress((prev) => ({ ...prev, [pathId]: data.completedLessonIds }));
+    setSaveError("");
+    try {
+      const res = await fetch("/api/apprendre/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pathId,
+          lessonId,
+          completed: !currently,
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setProgress((prev) => ({ ...prev, [pathId]: data.completedLessonIds }));
+      } else {
+        setSaveError(data.message || "Impossible d'enregistrer la progression.");
+      }
+    } catch {
+      setSaveError("Erreur réseau — progression non enregistrée.");
     }
   }
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-[1200px] px-5 py-20 text-ink/50">
-        Chargement du hub…
+      <div
+        className="mx-auto max-w-[1200px] page-pad py-16 md:py-20"
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <p className="sr-only">Chargement du hub…</p>
+        <div className="skeleton h-4 w-28" />
+        <div className="skeleton mt-4 h-10 w-72 max-w-full" />
+        <div className="skeleton mt-3 h-16 w-full max-w-xl" />
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="skeleton h-36" />
+          <div className="skeleton h-36" />
+          <div className="skeleton h-36" />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-[1200px] px-5 py-14 md:px-8 md:py-20">
+    <div className="mx-auto max-w-[1200px] page-pad py-14 md:py-20">
       <FadeIn>
         <p className="section-label">Espace membre</p>
         <h1 className="font-[family-name:var(--font-montserrat)] text-[clamp(1.9rem,4vw,3.2rem)] font-extrabold leading-[1.08] tracking-[-0.04em]">
@@ -133,7 +153,14 @@ export default function ApprendreHub() {
               {email ? ` · ${email}` : ""}
             </p>
           </div>
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-ink/8">
+          <div
+            className="mt-4 h-2 overflow-hidden rounded-full bg-ink/8"
+            role="progressbar"
+            aria-valuenow={pct}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Progression globale : ${pct} pour cent`}
+          >
             <motion.div
               className="h-full rounded-full bg-terracotta"
               initial={false}
@@ -153,11 +180,12 @@ export default function ApprendreHub() {
             <StaggerItem key={p.id}>
               <button
                 type="button"
+                aria-pressed={active}
                 onClick={() => {
                   setPathId(p.id);
                   setOpenLesson(null);
                 }}
-                className={`card-lift w-full rounded-2xl border p-6 text-left transition ${
+                className={`card-lift w-full rounded-2xl border p-5 text-left transition sm:p-6 ${
                   active
                     ? "border-terracotta border-t-[3px] bg-navy text-cream"
                     : "border-ink/10 bg-white text-ink hover:border-ink/20"
@@ -227,6 +255,11 @@ export default function ApprendreHub() {
             />
           ))}
         </div>
+        {saveError && (
+          <p className="mt-3 text-sm text-terracotta" role="alert">
+            {saveError}
+          </p>
+        )}
       </FadeIn>
 
       <FadeIn className="mt-10" delay={0.05}>
@@ -441,15 +474,21 @@ function PathQuizPanel({
                   <p className="font-medium">
                     {idx + 1}. {q.q}
                   </p>
-                  <div className="mt-3 space-y-2">
+                  <div
+                    className="mt-3 space-y-2"
+                    role="radiogroup"
+                    aria-label={`Question ${idx + 1}`}
+                  >
                     {q.choices.map((c, i) => (
                       <button
                         key={`${q.id}-${i}`}
                         type="button"
+                        role="radio"
+                        aria-checked={answers[q.id] === i}
                         onClick={() =>
                           setAnswers((prev) => ({ ...prev, [q.id]: i }))
                         }
-                        className={`w-full rounded-lg border px-3 py-2.5 text-left text-sm transition ${
+                        className={`min-h-11 w-full rounded-lg border px-3 py-2.5 text-left text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta ${
                           answers[q.id] === i
                             ? "border-terracotta bg-terracotta/10"
                             : "border-ink/12 hover:border-terracotta/40"
@@ -563,7 +602,7 @@ function LessonAccordion({
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-start gap-4 px-5 py-4 text-left md:px-6"
+        className="flex w-full items-start gap-3 px-4 py-4 text-left sm:gap-4 sm:px-5 md:px-6"
         aria-expanded={open}
       >
         <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink/5 font-[family-name:var(--font-montserrat)] text-sm font-bold text-terracotta">

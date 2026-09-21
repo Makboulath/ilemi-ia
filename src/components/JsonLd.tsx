@@ -9,7 +9,7 @@ export default function JsonLd() {
     "@type": "Organization",
     name: SITE.name,
     url: siteUrl,
-    logo: `${siteUrl}/logo-mark.png`,
+    logo: `${siteUrl}/logo-mark-sm.png`,
     description: SITE.description,
     email: LINKS.email,
     sameAs: [],

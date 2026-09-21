@@ -20,7 +20,12 @@ export default function ChatAssistant() {
 
   useEffect(() => {
     if (open) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      const reduce =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      bottomRef.current?.scrollIntoView({
+        behavior: reduce ? "auto" : "smooth",
+      });
       inputRef.current?.focus();
     }
   }, [open, messages, busy]);
@@ -30,8 +35,13 @@ export default function ChatAssistant() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   async function send(e?: FormEvent) {
@@ -76,10 +86,11 @@ export default function ChatAssistant() {
   if (hide) return null;
 
   return (
-    <div className="fixed bottom-5 right-5 z-[60] flex flex-col items-end gap-3">
+    <div className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-[max(1.25rem,env(safe-area-inset-right))] z-[60] flex flex-col items-end gap-3">
       {open && (
         <div
           role="dialog"
+          aria-modal="true"
           aria-label="Assistant Ilémi.IA"
           className="flex h-[min(520px,70vh)] w-[min(360px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-2xl border border-[#2a2a35] bg-[#F8F1E4] shadow-2xl"
         >
@@ -98,6 +109,14 @@ export default function ChatAssistant() {
                 Propulsé par Groq
               </p>
             </div>
+            <button
+              type="button"
+              aria-label="Fermer l'assistant"
+              onClick={() => setOpen(false)}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-lg text-white/80 transition hover:bg-white/10 hover:text-white"
+            >
+              ×
+            </button>
           </header>
 
           <div className="flex-1 space-y-3 overflow-y-auto px-3 py-4">

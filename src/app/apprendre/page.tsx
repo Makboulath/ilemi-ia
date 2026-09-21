@@ -14,7 +14,7 @@ export default function ApprendrePage() {
   return (
     <>
       <Header />
-      <main className="bg-cream text-ink">
+      <main id="contenu-principal" className="bg-cream text-ink">
         <ApprendreHub />
       </main>
       <Footer />

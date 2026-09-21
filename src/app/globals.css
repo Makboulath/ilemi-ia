@@ -202,3 +202,93 @@ h4 {
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+
+/* Shared light-surface form controls (auth, abonnement, apprendre, espace) */
+.field-light {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 15%, transparent);
+  background: #fff;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  color: var(--color-ink);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field-light:focus,
+.field-light:focus-visible {
+  border-color: var(--color-terracotta);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-terracotta) 22%, transparent);
+  outline: none;
+}
+
+.field-light:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.field-dark {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--color-cream) 15%, transparent);
+  background: color-mix(in srgb, var(--color-ink) 60%, transparent);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--color-cream);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field-dark::placeholder {
+  color: color-mix(in srgb, var(--color-cream) 30%, transparent);
+}
+
+.field-dark:focus,
+.field-dark:focus-visible {
+  border-color: var(--color-terracotta);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-terracotta) 28%, transparent);
+  outline: none;
+}
+
+.skeleton {
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* Safe horizontal padding on very small screens */
+.page-pad {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+@media (min-width: 640px) {
+  .page-pad {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .page-pad {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}

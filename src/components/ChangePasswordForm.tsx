@@ -64,7 +64,7 @@ export default function ChangePasswordForm() {
           required
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
-          className="w-full rounded border border-ink/15 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-terracotta"
+          className="field-light !rounded-lg !py-2.5 text-sm"
         />
       </div>
       <div>
@@ -79,7 +79,7 @@ export default function ChangePasswordForm() {
           minLength={8}
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          className="w-full rounded border border-ink/15 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-terracotta"
+          className="field-light !rounded-lg !py-2.5 text-sm"
         />
       </div>
       <div>
@@ -97,7 +97,7 @@ export default function ChangePasswordForm() {
           minLength={8}
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
-          className="w-full rounded border border-ink/15 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-terracotta"
+          className="field-light !rounded-lg !py-2.5 text-sm"
         />
       </div>
       {error && (
@@ -113,9 +113,10 @@ export default function ChangePasswordForm() {
       <button
         type="submit"
         disabled={pending}
+        aria-busy={pending}
         className="btn-ghost !border-ink/20 !text-ink disabled:opacity-50"
       >
-        {pending ? "…" : "Mettre à jour"}
+        {pending ? "Mise à jour…" : "Mettre à jour"}
       </button>
     </form>
   );
