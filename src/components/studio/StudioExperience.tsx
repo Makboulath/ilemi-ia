@@ -51,7 +51,7 @@ export default function StudioExperience() {
   const [zone, setZone] = useState<ZoneId>("image");
   const [prompt, setPrompt] = useState("");
   const [wallet, setWallet] = useState<Wallet | null>(null);
-  const [providers, setProviders] = useState({ image: false, video: false });
+  const [providers, setProviders] = useState({ image: true, video: false });
   const [adsense, setAdsense] = useState({
     configured: false,
     allowFake: false,
@@ -65,6 +65,7 @@ export default function StudioExperience() {
   const [paywallReason, setPaywallReason] = useState<"credits" | "daily">(
     "credits",
   );
+  const [guestMode, setGuestMode] = useState(false);
   const reduce = useReducedMotion();
 
   const refresh = useCallback(async () => {
@@ -75,12 +76,17 @@ export default function StudioExperience() {
       ]);
       if (w.ok) {
         setWallet(w.wallet);
-        setProviders(w.providers || { image: false, video: false });
+        setProviders({
+          image: true,
+          video: !!(w.providers && w.providers.video),
+        });
         setAdsense(w.adsense || { configured: false, allowFake: false });
+      } else {
+        setProviders((p) => ({ ...p, image: true }));
       }
       if (h.ok) setHistory(h.items || []);
     } catch {
-      /* ignore */
+      setProviders((p) => ({ ...p, image: true }));
     }
   }, []);
 
@@ -134,7 +140,8 @@ export default function StudioExperience() {
       }
       setResultUrl(data.url);
       setResultKind(zone === "image" ? "image" : "video");
-      await refresh();
+      setGuestMode(!!data.guest);
+      if (!data.guest) await refresh();
     } catch {
       setError("Erreur réseau.");
     } finally {
@@ -177,7 +184,7 @@ export default function StudioExperience() {
         <FadeIn>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="section-label !text-gold">Espace membre</p>
+              <p className="section-label !text-gold">Studio créatif</p>
               <h1 className="font-[family-name:var(--font-montserrat)] text-[clamp(2.2rem,5vw,3.8rem)] font-extrabold leading-[1.05] tracking-[-0.04em]">
                 Studio Ilémi
               </h1>
@@ -246,12 +253,10 @@ export default function StudioExperience() {
               </h2>
               <p className="mt-2 text-sm text-cream/50">
                 {zone === "image"
-                  ? providers.image
-                    ? "Provider image configuré (serveur)."
-                    : "Images via Pollinations (gratuit). Gemini / fal / OpenAI si configurés."
+                  ? "Images gratuites via Pollinations (Flux, open source). Sans compte : mode démo. Connecté : historique + crédits."
                   : providers.video
                     ? "Provider vidéo fal.ai configuré."
-                    : "Aucun FAL_KEY — génération vidéo indisponible (503)."}
+                    : "Vidéo : connectez-vous et configurez FAL_KEY (pas encore en démo gratuite)."}
               </p>
               <textarea
                 value={prompt}
@@ -287,6 +292,15 @@ export default function StudioExperience() {
               {error && (
                 <p className="mt-3 text-sm text-terracotta" role="alert">
                   {error}
+                </p>
+              )}
+              {guestMode && !error && zone === "image" && (
+                <p className="mt-3 text-sm text-cream/55">
+                  Mode démo gratuit.{" "}
+                  <Link href="/connexion?next=/studio" className="text-gold underline">
+                    Connexion
+                  </Link>{" "}
+                  pour garder l&apos;historique et les crédits.
                 </p>
               )}
               <div className="relative mt-6 min-h-[200px] overflow-hidden rounded-xl border border-cream/10 bg-gradient-to-br from-navy to-ink">

@@ -13,17 +13,25 @@ function geminiKey(): string | undefined {
   );
 }
 
+/** Free open-source Flux via Pollinations — hotlink for the browser (no key, unlimited soft-cap). */
+export function pollinationsImageUrl(prompt: string): GenResult {
+  const clean = prompt.replace(/\s+/g, " ").trim().slice(0, 400);
+  const seed = Date.now() % 100000;
+  const url =
+    `https://image.pollinations.ai/prompt/${encodeURIComponent(clean)}` +
+    `?width=1024&height=768&nologo=true&model=flux&seed=${seed}`;
+  return { url, provider: "pollinations:flux" };
+}
+
 /** Gemini native image generation (Google AI Studio). */
 async function generateImageGemini(prompt: string): Promise<GenResult> {
   const key = geminiKey();
   if (!key) throw new Error("NO_GEMINI_KEY");
 
-  // Current image-capable models (order: cheapest/fastest first).
   const models = [
     "gemini-2.5-flash-image",
     "gemini-3.1-flash-lite-image",
     "gemini-3.1-flash-image",
-    "gemini-3.1-flash-image-preview",
   ];
 
   let lastErr = "GEMINI_IMAGE_FAILED";
@@ -43,8 +51,7 @@ async function generateImageGemini(prompt: string): Promise<GenResult> {
     );
     const text = await res.text();
     if (!res.ok) {
-      lastErr = `GEMINI_IMAGE_FAILED:${model}:${res.status}:${text.slice(0, 180)}`;
-      // Quota exhausted — skip remaining Gemini models
+      lastErr = `GEMINI_IMAGE_FAILED:${model}:${res.status}`;
       if (res.status === 429) break;
       continue;
     }
@@ -53,7 +60,6 @@ async function generateImageGemini(prompt: string): Promise<GenResult> {
         content?: {
           parts?: {
             inlineData?: { mimeType?: string; data?: string };
-            text?: string;
           }[];
         };
       }[];
@@ -80,42 +86,17 @@ async function generateImageGemini(prompt: string): Promise<GenResult> {
   throw new Error(lastErr);
 }
 
-/**
- * Free anonymous fallback (no API key). Rate-limited ~1 req / 15s.
- * Returns a hotlink URL the browser can load directly.
- */
-async function generateImagePollinations(prompt: string): Promise<GenResult> {
-  const clean = prompt.replace(/\s+/g, " ").trim().slice(0, 400);
-  const seed = Date.now() % 100000;
-  const url =
-    `https://image.pollinations.ai/prompt/${encodeURIComponent(clean)}` +
-    `?width=1024&height=768&nologo=true&model=flux&seed=${seed}`;
-
-  // Soft probe: accept 200 image OR just return the URL (CDN serves on GET from client).
-  try {
-    const res = await fetch(url, {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; ilemi-ia/1.0)" },
-      redirect: "follow",
-      signal: AbortSignal.timeout(55_000),
-    });
-    const ctype = res.headers.get("content-type") || "";
-    if (res.ok && ctype.startsWith("image/")) {
-      const buf = Buffer.from(await res.arrayBuffer());
-      if (buf.length > 1000) {
-        return {
-          url: `data:${ctype};base64,${buf.toString("base64")}`,
-          provider: "pollinations",
-        };
-      }
-    }
-  } catch {
-    // fall through to hotlink
-  }
-  return { url, provider: "pollinations:hotlink" };
-}
-
-export async function generateImage(prompt: string): Promise<GenResult> {
+export async function generateImage(
+  prompt: string,
+  opts?: { preferFree?: boolean }
+): Promise<GenResult> {
+  const preferFree = opts?.preferFree !== false;
   const errors: string[] = [];
+
+  // Free path first when demo / guest / no paid budget
+  if (preferFree) {
+    return pollinationsImageUrl(prompt);
+  }
 
   if (geminiKey()) {
     try {
@@ -144,9 +125,7 @@ export async function generateImage(prompt: string): Promise<GenResult> {
         const text = await res.text().catch(() => "");
         throw new Error(`FAL_IMAGE_FAILED:${res.status}:${text.slice(0, 200)}`);
       }
-      const data = (await res.json()) as {
-        images?: { url: string }[];
-      };
+      const data = (await res.json()) as { images?: { url: string }[] };
       const url = data.images?.[0]?.url;
       if (!url) throw new Error("FAL_IMAGE_NO_URL");
       return { url, provider: "fal" };
@@ -184,49 +163,8 @@ export async function generateImage(prompt: string): Promise<GenResult> {
     }
   }
 
-  const replicate = process.env.REPLICATE_API_TOKEN?.trim();
-  if (replicate) {
-    try {
-      const res = await fetch(
-        "https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${replicate}`,
-            "Content-Type": "application/json",
-            Prefer: "wait",
-          },
-          body: JSON.stringify({ input: { prompt } }),
-        }
-      );
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        throw new Error(
-          `REPLICATE_IMAGE_FAILED:${res.status}:${text.slice(0, 200)}`
-        );
-      }
-      const data = (await res.json()) as { output?: string | string[] };
-      const out = data.output;
-      const url = Array.isArray(out) ? out[0] : out;
-      if (!url) throw new Error("REPLICATE_IMAGE_NO_URL");
-      return { url, provider: "replicate" };
-    } catch (e) {
-      errors.push(e instanceof Error ? e.message : String(e));
-    }
-  }
-
-  // Always-available free fallback when paid/Gemini keys fail or are missing
-  try {
-    return await generateImagePollinations(prompt);
-  } catch (e) {
-    errors.push(e instanceof Error ? e.message : String(e));
-  }
-
-  throw new Error(
-    errors.length
-      ? `NO_IMAGE_PROVIDER:${errors.join("|").slice(0, 400)}`
-      : "NO_IMAGE_PROVIDER"
-  );
+  // Always available free fallback
+  return pollinationsImageUrl(prompt);
 }
 
 export async function generateVideo(prompt: string): Promise<GenResult> {
@@ -257,7 +195,6 @@ export async function generateVideo(prompt: string): Promise<GenResult> {
 }
 
 export function hasImageProvider(): boolean {
-  // Pollinations needs no key — images always available
   return true;
 }
 

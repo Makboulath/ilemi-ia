@@ -6,17 +6,16 @@ import {
   ensureWallet,
   snapshot,
 } from "@/lib/studio/credits";
-import { generateImage, hasImageProvider } from "@/lib/studio/providers";
+import {
+  generateImage,
+  hasImageProvider,
+  pollinationsImageUrl,
+} from "@/lib/studio/providers";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 export async function POST(request: Request) {
-  const auth = await requireDbUser();
-  if (!auth) {
-    return NextResponse.json({ ok: false, message: "Non authentifié." }, { status: 401 });
-  }
-
   let body: { prompt?: string };
   try {
     body = await request.json();
@@ -33,29 +32,41 @@ export async function POST(request: Request) {
       {
         ok: false,
         code: "NO_PROVIDER",
-        message:
-          "Génération image indisponible pour le moment. Réessayez dans quelques secondes.",
+        message: "Génération image indisponible pour le moment.",
       },
       { status: 503 }
     );
   }
 
-  const prisma = await ensureDb();
-  const user = await ensureWallet(prisma, auth.user.id);
-  if (user.credits < IMAGE_CREDIT_COST) {
-    return NextResponse.json(
-      {
-        ok: false,
-        code: "NO_CREDITS",
-        message: "Crédits insuffisants.",
-        wallet: snapshot(user),
-      },
-      { status: 402 }
-    );
+  const auth = await requireDbUser();
+
+  // Guest / session without DB row: free Pollinations demo (no credits, no history)
+  if (!auth) {
+    const result = pollinationsImageUrl(prompt);
+    return NextResponse.json({
+      ok: true,
+      url: result.url,
+      provider: result.provider,
+      guest: true,
+    });
   }
 
   try {
-    const result = await generateImage(prompt);
+    const prisma = await ensureDb();
+    const user = await ensureWallet(prisma, auth.user.id);
+    if (user.credits < IMAGE_CREDIT_COST) {
+      // Still allow free Pollinations so Studio never feels broken
+      const result = pollinationsImageUrl(prompt);
+      return NextResponse.json({
+        ok: true,
+        url: result.url,
+        provider: result.provider,
+        wallet: snapshot(user),
+        note: "Mode gratuit Pollinations (crédits épuisés).",
+      });
+    }
+
+    const result = await generateImage(prompt, { preferFree: true });
     const updated = await prisma.user.update({
       where: { id: user.id },
       data: { credits: { decrement: IMAGE_CREDIT_COST } },
@@ -65,7 +76,7 @@ export async function POST(request: Request) {
         userId: user.id,
         type: "image",
         prompt,
-        url: result.url,
+        url: result.url.slice(0, 2000),
         meta: JSON.stringify({ provider: result.provider }),
       },
     });
@@ -75,11 +86,15 @@ export async function POST(request: Request) {
       provider: result.provider,
       wallet: snapshot(updated),
     });
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "Erreur génération";
-    return NextResponse.json(
-      { ok: false, message: `Échec génération image (${msg}).` },
-      { status: 502 }
-    );
+  } catch {
+    // DB flaky on Vercel SQLite — never block image demo
+    const result = pollinationsImageUrl(prompt);
+    return NextResponse.json({
+      ok: true,
+      url: result.url,
+      provider: result.provider,
+      guest: true,
+      note: "Mode démo (base temporaire indisponible).",
+    });
   }
 }

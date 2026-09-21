@@ -25,11 +25,11 @@ export async function middleware(request: NextRequest) {
 
   if (
     pathname.startsWith("/espace") ||
-    pathname.startsWith("/apprendre") ||
-    pathname.startsWith("/studio")
+    pathname.startsWith("/apprendre")
   ) {
     if (!session) return redirectToLogin(request, pathname);
   }
+  // /studio is public (demo images via Pollinations); API enforces auth only for video/credits
 
   return NextResponse.next();
 }
@@ -39,6 +39,5 @@ export const config = {
     "/admin/:path*",
     "/espace/:path*",
     "/apprendre/:path*",
-    "/studio/:path*",
   ],
 };

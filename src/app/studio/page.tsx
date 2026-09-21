@@ -6,8 +6,7 @@ import StudioExperience from "@/components/studio/StudioExperience";
 export const metadata: Metadata = {
   title: "Studio Ilémi",
   description:
-    "Studio créatif Ilémi, Image, Vidéo, Son. Espace membre pour expérimenter l'IA créative.",
-  robots: { index: false, follow: false },
+    "Studio créatif Ilémi — générez des images IA gratuitement (Pollinations Flux), testez vidéo et liens audio.",
 };
 
 export default function StudioPage() {
