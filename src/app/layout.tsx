@@ -4,6 +4,7 @@ import "./globals.css";
 import { SITE } from "@/lib/constants";
 import PageTracker from "@/components/PageTracker";
 import JsonLd from "@/components/JsonLd";
+import ChatAssistant from "@/components/ChatAssistant";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -87,6 +88,7 @@ export default function RootLayout({
         <JsonLd />
         <PageTracker />
         {children}
+        <ChatAssistant />
       </body>
     </html>
   );
