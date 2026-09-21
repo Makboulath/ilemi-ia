@@ -253,7 +253,7 @@ export default function StudioExperience() {
               </h2>
               <p className="mt-2 text-sm text-cream/50">
                 {zone === "image"
-                  ? "Images gratuites via Pollinations (Sana HD + enhance). Sans compte : démo. Qualité premium : clé Pollinations ou Gemini plus tard."
+                  ? "Images via Pollinations (prompt respecté, sans rewrite). Qualité limitée en gratuit — branche une clé Pollinations ou Gemini pour du premium."
                   : providers.video
                     ? "Provider vidéo fal.ai configuré."
                     : "Vidéo : connectez-vous et configurez FAL_KEY (pas encore en démo gratuite)."}

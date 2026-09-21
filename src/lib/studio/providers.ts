@@ -13,42 +13,34 @@ function geminiKey(): string | undefined {
   );
 }
 
-const QUALITY_SUFFIX =
-  ", photographie éditoriale haute définition, lumière douce naturelle, détails nets, peau réaliste, composition soignée, 85mm";
-
-const NEGATIVE =
-  "blurry, lowres, low quality, jpeg artifacts, distorted face, extra fingers, watermark, text, logo, ugly, noise, oversaturated";
-
-/** Enrich a short user prompt without duplicating quality tags. */
+/** Keep the user prompt intact — only light cleanup. */
 export function enrichImagePrompt(prompt: string): string {
-  const clean = prompt.replace(/\s+/g, " ").trim().slice(0, 320);
-  if (/haute définition|highly detailed|8k|photoreal|éditorial|cinematic/i.test(clean)) {
-    return clean;
-  }
-  return `${clean}${QUALITY_SUFFIX}`.slice(0, 480);
+  return prompt.replace(/\s+/g, " ").trim().slice(0, 480);
 }
 
 /**
  * Free Pollinations (anonymous).
- * Note: free tier currently serves DreamShaper/Sana — not full Flux.
- * We push quality via enhance + HD + negative prompt + enriched prompt.
+ * Free tier ≈ Sana/DreamShaper. Do NOT use enhance=true: it rewrites
+ * prompts and often ignores the user's request.
  */
 export function pollinationsImageUrl(prompt: string): GenResult {
-  const enriched = enrichImagePrompt(prompt);
+  const clean = enrichImagePrompt(prompt);
   const seed = Date.now() % 100000;
   const params = new URLSearchParams({
     width: "1024",
     height: "1024",
     nologo: "true",
-    enhance: "true",
+    enhance: "false",
     quality: "hd",
     model: "sana",
     seed: String(seed),
     private: "true",
-    negative_prompt: NEGATIVE,
+    // Mild negatives only — no prompt rewrite
+    negative_prompt:
+      "blurry, lowres, watermark, text, logo, extra fingers, distorted face",
   });
   const url =
-    `https://image.pollinations.ai/prompt/${encodeURIComponent(enriched)}` +
+    `https://image.pollinations.ai/prompt/${encodeURIComponent(clean)}` +
     `?${params.toString()}`;
   return { url, provider: "pollinations:sana+hd" };
 }
