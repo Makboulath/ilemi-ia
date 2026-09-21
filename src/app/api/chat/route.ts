@@ -46,6 +46,7 @@ export async function POST(request: Request) {
 
   const priorUserCount = messages.filter((m) => m.role === "user").length - 1;
   const key = process.env.GROQ_API_KEY?.trim();
+  let fallbackReason = key ? "GROQ_UNREACHABLE" : "NO_GROQ_KEY";
 
   if (key) {
     try {
@@ -83,9 +84,12 @@ export async function POST(request: Request) {
             provider: "groq",
           });
         }
+        fallbackReason = "GROQ_EMPTY";
+      } else {
+        fallbackReason = `GROQ_HTTP_${res.status}`;
       }
     } catch {
-      // fall through
+      fallbackReason = "GROQ_NETWORK";
     }
   }
 
@@ -93,5 +97,6 @@ export async function POST(request: Request) {
     ok: true,
     reply: offlineReply(lastUser.content, Math.max(0, priorUserCount)),
     provider: "offline",
+    fallbackReason,
   });
 }
