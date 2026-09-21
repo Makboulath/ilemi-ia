@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import {
   authenticate,
+  applySessionCookie,
   createSessionToken,
-  setSessionCookie,
 } from "@/lib/auth";
 
 export async function POST(request: Request) {
@@ -36,13 +36,13 @@ export async function POST(request: Request) {
     }
 
     const token = await createSessionToken(session);
-    await setSessionCookie(token);
-
-    return NextResponse.json({
+    const res = NextResponse.json({
       ok: true,
       role: session.role,
       email: session.email,
     });
+    applySessionCookie(res, token);
+    return res;
   } catch {
     return NextResponse.json(
       {

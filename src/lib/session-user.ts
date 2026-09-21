@@ -6,33 +6,44 @@ export async function requireSession(): Promise<SessionPayload | null> {
   return getSession();
 }
 
-/** Resolve the Prisma User row for the current session (env-admin excluded). */
+/**
+ * Resolve the Prisma User for the current session.
+ * A valid JWT is authoritative: if the row is missing (e.g. ephemeral
+ * /tmp SQLite on another serverless instance right after login), recreate
+ * it from the session claims so APIs do not 401 and bounce the user to
+ * /connexion while the cookie is still valid.
+ */
 export async function requireDbUser(): Promise<
   { session: SessionPayload; user: User } | null
 > {
   const session = await getSession();
   if (!session) return null;
-  if (session.sub === "env-admin") {
-    // Ensure a durable admin row exists when possible
-    const prisma = await ensureDb();
-    const email = session.email;
-    let user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          email,
-          passwordHash: "!", // not used for env-admin login
-          role: "ADMIN",
-          credits: 7,
-          creditsBootstrapped: true,
-          plan: "PRO",
-        },
-      });
-    }
-    return { session: { ...session, sub: user.id }, user };
-  }
+
   const prisma = await ensureDb();
-  const user = await prisma.user.findUnique({ where: { id: session.sub } });
-  if (!user) return null;
-  return { session, user };
+
+  let user =
+    session.sub !== "env-admin"
+      ? await prisma.user.findUnique({ where: { id: session.sub } })
+      : null;
+
+  if (!user) {
+    user = await prisma.user.findUnique({ where: { email: session.email } });
+  }
+
+  if (!user) {
+    const isAdmin = session.role === "ADMIN";
+    user = await prisma.user.create({
+      data: {
+        ...(session.sub !== "env-admin" ? { id: session.sub } : {}),
+        email: session.email,
+        passwordHash: "!", // placeholder when row is healed from JWT only
+        role: session.role,
+        credits: 7,
+        creditsBootstrapped: true,
+        plan: isAdmin ? "PRO" : "FREE",
+      },
+    });
+  }
+
+  return { session: { ...session, sub: user.id }, user };
 }

@@ -5,7 +5,7 @@ import { SESSION_COOKIE, verifyTokenEdge } from "@/lib/auth-edge";
 function redirectToLogin(request: NextRequest, pathname: string) {
   const url = request.nextUrl.clone();
   url.pathname = "/connexion";
-  url.searchParams.set("next", pathname);
+  url.searchParams.set("next", pathname + (request.nextUrl.search || ""));
   return NextResponse.redirect(url);
 }
 
@@ -19,6 +19,7 @@ export async function proxy(request: NextRequest) {
     if (session.role !== "ADMIN") {
       const url = request.nextUrl.clone();
       url.pathname = "/espace";
+      url.search = "";
       return NextResponse.redirect(url);
     }
   }
@@ -36,8 +37,11 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/admin",
     "/admin/:path*",
+    "/espace",
     "/espace/:path*",
+    "/apprendre",
     "/apprendre/:path*",
   ],
 };

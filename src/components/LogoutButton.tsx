@@ -1,19 +1,20 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function LogoutButton() {
-  const router = useRouter();
   const [pending, setPending] = useState(false);
 
   async function logout() {
     setPending(true);
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
-      router.push("/");
-      router.refresh();
-    } finally {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+      // Full navigation so sticky Header / proxy re-read the cleared cookie.
+      window.location.assign("/");
+    } catch {
       setPending(false);
     }
   }

@@ -43,6 +43,7 @@ export default function AuthForm({
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json().catch(() => ({}));

@@ -34,17 +34,29 @@ export default function ApprendreHub() {
 
   const load = useCallback(async () => {
     try {
-      const me = await fetch("/api/auth/me").then((r) => r.json());
-      if (!me?.user) {
+      const me = await fetch("/api/auth/me", { credentials: "same-origin" }).then(
+        (r) => r.json(),
+      );
+      // Only bounce to login when the session cookie itself is missing/invalid.
+      // Progress API failures (DB race, transient 5xx) must NOT look like logout.
+      if (!me?.ok || !me?.user) {
         router.replace("/connexion?next=/apprendre");
         return;
       }
       setEmail(me.user.email || "");
-      const data = await fetch("/api/apprendre/progress").then((r) => r.json());
+      const data = await fetch("/api/apprendre/progress", {
+        credentials: "same-origin",
+      }).then((r) => r.json());
       if (!data.ok) {
-        router.replace("/connexion?next=/apprendre");
+        setSaveError(
+          data.message ||
+            "Impossible de charger la progression. Réessayez dans un instant.",
+        );
+        setProgress({});
+        setCerts({});
         return;
       }
+      setSaveError("");
       setProgress(data.progress || {});
       setDisplayName(data.displayName || "");
       const map: Record<string, { code: string; issuedAt: string }> = {};
@@ -53,7 +65,7 @@ export default function ApprendreHub() {
       }
       setCerts(map);
     } catch {
-      router.replace("/connexion?next=/apprendre");
+      setSaveError("Erreur réseau — impossible de charger le hub.");
     } finally {
       setLoading(false);
     }

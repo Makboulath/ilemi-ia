@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import {
+  applySessionCookie,
   createSessionToken,
   hashPassword,
   hashResetToken,
-  setSessionCookie,
 } from "@/lib/auth";
 import { ensureDb } from "@/lib/db";
 
@@ -70,13 +70,13 @@ export async function POST(request: Request) {
       email: updated.email,
       role: updated.role,
     });
-    await setSessionCookie(sessionToken);
-
-    return NextResponse.json({
+    const res = NextResponse.json({
       ok: true,
       message: "Mot de passe mis à jour. Vous êtes connecté·e.",
       role: updated.role,
     });
+    applySessionCookie(res, sessionToken);
+    return res;
   } catch (err) {
     console.error("[reset-password]", err);
     return NextResponse.json(

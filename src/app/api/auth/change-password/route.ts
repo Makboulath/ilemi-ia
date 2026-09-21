@@ -1,19 +1,17 @@
 import { NextResponse } from "next/server";
-import {
-  getSession,
-  hashPassword,
-  verifyPassword,
-} from "@/lib/auth";
+import { hashPassword, verifyPassword } from "@/lib/auth";
 import { ensureDb } from "@/lib/db";
+import { requireDbUser } from "@/lib/session-user";
 
 export async function POST(request: Request) {
-  const session = await getSession();
-  if (!session) {
+  const auth = await requireDbUser();
+  if (!auth) {
     return NextResponse.json(
       { ok: false, message: "Non authentifié." },
       { status: 401 }
     );
   }
+  const { user } = auth;
 
   let body: { currentPassword?: string; newPassword?: string };
   try {
@@ -41,19 +39,7 @@ export async function POST(request: Request) {
 
   try {
     const prisma = await ensureDb();
-    const user =
-      session.sub === "env-admin"
-        ? await prisma.user.findUnique({ where: { email: session.email } })
-        : await prisma.user.findUnique({ where: { id: session.sub } });
-
-    if (!user) {
-      return NextResponse.json(
-        { ok: false, message: "Compte introuvable." },
-        { status: 404 }
-      );
-    }
-
-    // Env-admin may have placeholder hash "!" — allow ADMIN_PASSWORD match
+    // Env-admin / healed rows may have placeholder hash "!" — allow ADMIN_PASSWORD match
     let currentOk = false;
     if (user.passwordHash && user.passwordHash !== "!") {
       currentOk = await verifyPassword(currentPassword, user.passwordHash);

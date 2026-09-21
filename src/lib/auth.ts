@@ -61,20 +61,44 @@ export async function verifySessionToken(
   }
 }
 
-export async function setSessionCookie(token: string): Promise<void> {
-  const jar = await cookies();
-  jar.set(SESSION_COOKIE, token, {
-    httpOnly: true,
+export function sessionCookieOptions() {
+  return {
+    httpOnly: true as const,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "lax" as const,
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
+  };
+}
+
+/** Prefer attaching the cookie on the Route Handler response (reliable Set-Cookie). */
+export function applySessionCookie(
+  res: { cookies: { set: (name: string, value: string, opts: object) => void } },
+  token: string
+): void {
+  res.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
+}
+
+export async function setSessionCookie(token: string): Promise<void> {
+  const jar = await cookies();
+  jar.set(SESSION_COOKIE, token, sessionCookieOptions());
+}
+
+export function clearSessionCookieOn(
+  res: { cookies: { set: (name: string, value: string, opts: object) => void } }
+): void {
+  res.cookies.set(SESSION_COOKIE, "", {
+    ...sessionCookieOptions(),
+    maxAge: 0,
   });
 }
 
 export async function clearSessionCookie(): Promise<void> {
   const jar = await cookies();
-  jar.delete(SESSION_COOKIE);
+  jar.set(SESSION_COOKIE, "", {
+    ...sessionCookieOptions(),
+    maxAge: 0,
+  });
 }
 
 export async function getSession(): Promise<SessionPayload | null> {

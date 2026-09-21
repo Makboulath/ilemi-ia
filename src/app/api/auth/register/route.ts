@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import {
+  applySessionCookie,
   createSessionToken,
   hashPassword,
-  setSessionCookie,
 } from "@/lib/auth";
 import { ensureDb } from "@/lib/db";
 
@@ -71,9 +71,9 @@ export async function POST(request: Request) {
       email: user.email,
       role: user.role,
     });
-    await setSessionCookie(token);
-
-    return NextResponse.json({ ok: true, role: user.role, email: user.email });
+    const res = NextResponse.json({ ok: true, role: user.role, email: user.email });
+    applySessionCookie(res, token);
+    return res;
   } catch {
     return NextResponse.json(
       {
